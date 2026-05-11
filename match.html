@@ -83,7 +83,23 @@ h2{margin:0 0 14px;font-size:20px}
 
 </main>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
+authDomain: "proliga-1c9c3.firebaseapp.com",
+projectId: "proliga-1c9c3",
+storageBucket: "proliga-1c9c3.firebasestorage.app",
+messagingSenderId: "855885881253",
+appId: "1:855885881253:web:513f4eda5e65bf2ef9524c",
+measurementId: "G-87WHR4QBSL"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const clubLogos={
 "Victoria FC":"Projekt bez nazwy_20260508_214403_0000.png",
 "Olimpia FC":"Projekt bez nazwy_20260508_214448_0000.png",
@@ -97,7 +113,11 @@ const clubLogos={
 "Inter Blaze":"Projekt bez nazwy_20260508_215133_0000.png"
 };
 
-const officialScores={
+const firebaseMatchIds={
+"ProLiga 1|1|Victoria FC|City Rangers":"victoria-city"
+};
+
+const localScores={
 "ProLiga 1":{
 "1|Victoria FC|City Rangers": {home: 2, away: 1},
 "1|Olimpia FC|Sporting Vale": {home: 4, away: 4},
@@ -119,44 +139,6 @@ const matchEvents={
 {minute:"14'",team:"Victoria FC",type:"goal"},
 {minute:"27'",team:"City Rangers",type:"goal"},
 {minute:"76'",team:"Victoria FC",type:"goal"}
-],
-
-"ProLiga 1|1|Olimpia FC|Sporting Vale":[
-{minute:"9'",team:"Olimpia FC",type:"goal"},
-{minute:"22'",team:"Sporting Vale",type:"goal"},
-{minute:"39'",team:"Olimpia FC",type:"goal"},
-{minute:"44'",team:"Sporting Vale",type:"goal"},
-{minute:"61'",team:"Olimpia FC",type:"goal"},
-{minute:"72'",team:"Sporting Vale",type:"goal"},
-{minute:"80'",team:"Olimpia FC",type:"goal"},
-{minute:"88'",team:"Sporting Vale",type:"goal"}
-],
-
-"ProLiga 1|1|Royal Falcons|Inter Blaze":[
-{minute:"18'",team:"Royal Falcons",type:"goal"},
-{minute:"35'",team:"Inter Blaze",type:"goal"},
-{minute:"57'",team:"Royal Falcons",type:"goal"},
-{minute:"82'",team:"Inter Blaze",type:"goal"}
-],
-
-"ProLiga 1|1|Olympique Nova|Union Crest":[
-{minute:"11'",team:"Union Crest",type:"goal"},
-{minute:"24'",team:"Olympique Nova",type:"goal"},
-{minute:"38'",team:"Union Crest",type:"goal"},
-{minute:"51'",team:"Olympique Nova",type:"goal"},
-{minute:"67'",team:"Union Crest",type:"goal"},
-{minute:"74'",team:"Olympique Nova",type:"goal"},
-{minute:"89'",team:"Union Crest",type:"goal"}
-],
-
-"ProLiga 1|1|Real Vanguardia|Virello":[
-{minute:"5'",team:"Virello",type:"goal"},
-{minute:"18'",team:"Virello",type:"goal"},
-{minute:"31'",team:"Real Vanguardia",type:"goal"},
-{minute:"45'",team:"Virello",type:"goal"},
-{minute:"53'",team:"Virello",type:"goal"},
-{minute:"70'",team:"Virello",type:"goal"},
-{minute:"84'",team:"Virello",type:"goal"}
 ]
 };
 
@@ -174,23 +156,41 @@ const away=parts[3];
 document.getElementById("matchInfo").textContent=league+" • Matchday "+round;
 document.getElementById("homeTeam").textContent=home;
 document.getElementById("awayTeam").textContent=away;
-
 document.getElementById("homeLogo").src=clubLogos[home] || "";
 document.getElementById("awayLogo").src=clubLogos[away] || "";
 
-const score=officialScores[league]?.[round+"|"+home+"|"+away];
+const matchKey=league+"|"+round+"|"+home+"|"+away;
+let score=null;
+let status="NS";
+
+const firebaseId=firebaseMatchIds[matchKey];
+
+if(firebaseId){
+const matchRef=doc(db,"matches",firebaseId);
+const matchSnap=await getDoc(matchRef);
+
+if(matchSnap.exists()){
+const data=matchSnap.data();
+score={home:data.homeScore,away:data.awayScore};
+status=data.status || "FT";
+}
+}
+
+if(!score){
+score=localScores[league]?.[round+"|"+home+"|"+away] || null;
+if(score) status="FT";
+}
 
 if(score){
 document.getElementById("score").textContent=score.home+" : "+score.away;
-document.getElementById("status").textContent="FT";
+document.getElementById("status").textContent=status;
 }else{
 document.getElementById("score").textContent="- : -";
 document.getElementById("status").textContent="NS";
 }
 
 const timeline=document.getElementById("timeline");
-const eventKey=league+"|"+round+"|"+home+"|"+away;
-const events=matchEvents[eventKey] || [];
+const events=matchEvents[matchKey] || [];
 
 timeline.innerHTML="";
 
