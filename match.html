@@ -6,202 +6,38 @@
 <title>ProLiga Match Center</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#08111f;
-color:#e5e7eb;
-}
-
-header{
-padding:18px;
-text-align:center;
-background:#020617;
-border-bottom:1px solid #1e293b;
-}
-
-header h1{
-margin:0;
-font-size:24px;
-}
-
-header p{
-margin:6px 0 0;
-color:#94a3b8;
-font-size:13px;
-}
-
-main{
-max-width:850px;
-margin:18px auto;
-padding:0 12px 40px;
-}
-
-.card{
-background:#0f172a;
-border:1px solid #1e293b;
-border-radius:20px;
-padding:18px;
-margin-bottom:18px;
-box-shadow:0 8px 30px rgba(0,0,0,.25);
-}
-
-.match-top{
-text-align:center;
-color:#94a3b8;
-font-size:13px;
-margin-bottom:18px;
-}
-
-.scoreboard{
-display:grid;
-grid-template-columns:1fr 120px 1fr;
-gap:12px;
-align-items:center;
-}
-
-.team{
-text-align:center;
-}
-
-.team img{
-width:76px;
-height:76px;
-object-fit:contain;
-margin-bottom:8px;
-}
-
-.team-name{
-font-weight:bold;
-font-size:15px;
-color:white;
-}
-
-.score{
-font-size:42px;
-font-weight:bold;
-text-align:center;
-color:white;
-}
-
-.status{
-display:inline-block;
-margin-top:8px;
-padding:5px 12px;
-border-radius:999px;
-background:#334155;
-color:white;
-font-size:12px;
-font-weight:bold;
-}
-
-h2{
-margin:0 0 14px;
-font-size:20px;
-}
-
-.timeline{
-position:relative;
-padding:8px 0;
-}
-
-.timeline:before{
-content:"";
-position:absolute;
-left:50%;
-top:0;
-bottom:0;
-width:2px;
-background:#334155;
-transform:translateX(-50%);
-}
-
-.event{
-display:grid;
-grid-template-columns:1fr 56px 1fr;
-align-items:center;
-margin:14px 0;
-position:relative;
-}
-
-.minute{
-text-align:center;
-font-weight:bold;
-color:#cbd5e1;
-background:#111827;
-border:1px solid #334155;
-border-radius:999px;
-padding:5px 0;
-z-index:2;
-font-size:13px;
-}
-
-.event-box{
-background:#111827;
-border:1px solid #334155;
-border-radius:14px;
-padding:10px 12px;
-font-size:14px;
-}
-
-.event-left{
-text-align:right;
-margin-right:12px;
-}
-
-.event-right{
-text-align:left;
-margin-left:12px;
-}
-
-.goal{
-border-color:#16a34a;
-}
-
-.yellow{
-border-color:#eab308;
-}
-
-.red{
-border-color:#dc2626;
-}
-
-.empty{
-visibility:hidden;
-}
-
-.back{
-display:block;
-text-align:center;
-color:#93c5fd;
-text-decoration:none;
-margin-top:14px;
-}
-
+body{margin:0;font-family:Arial,sans-serif;background:#08111f;color:#e5e7eb}
+header{padding:18px;text-align:center;background:#020617;border-bottom:1px solid #1e293b}
+header h1{margin:0;font-size:24px}
+header p{margin:6px 0 0;color:#94a3b8;font-size:13px}
+main{max-width:850px;margin:18px auto;padding:0 12px 40px}
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:20px;padding:18px;margin-bottom:18px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.match-top{text-align:center;color:#94a3b8;font-size:13px;margin-bottom:18px}
+.scoreboard{display:grid;grid-template-columns:1fr 120px 1fr;gap:12px;align-items:center}
+.team{text-align:center}
+.team img{width:76px;height:76px;object-fit:contain;margin-bottom:8px}
+.team-name{font-weight:bold;font-size:15px;color:white}
+.score{font-size:42px;font-weight:bold;text-align:center;color:white}
+.status{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:999px;background:#334155;color:white;font-size:12px;font-weight:bold}
+h2{margin:0 0 14px;font-size:20px}
+.timeline{position:relative;padding:8px 0}
+.timeline:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:#334155;transform:translateX(-50%)}
+.event{display:grid;grid-template-columns:1fr 56px 1fr;align-items:center;margin:14px 0;position:relative}
+.minute{text-align:center;font-weight:bold;color:#cbd5e1;background:#111827;border:1px solid #334155;border-radius:999px;padding:5px 0;z-index:2;font-size:13px}
+.event-box{background:#111827;border:1px solid #334155;border-radius:14px;padding:10px 12px;font-size:14px}
+.event-left{text-align:right;margin-right:12px}
+.event-right{text-align:left;margin-left:12px}
+.goal{border-color:#16a34a}
+.yellow{border-color:#eab308}
+.red{border-color:#dc2626}
+.empty{visibility:hidden}
+.back{display:block;text-align:center;color:#93c5fd;text-decoration:none;margin-top:14px}
 @media(max-width:650px){
-
-.scoreboard{
-grid-template-columns:1fr 90px 1fr;
-}
-
-.team img{
-width:58px;
-height:58px;
-}
-
-.score{
-font-size:34px;
-}
-
-.event{
-grid-template-columns:1fr 48px 1fr;
-}
-
-.event-box{
-font-size:12px;
-padding:8px;
-}
-
+.scoreboard{grid-template-columns:1fr 90px 1fr}
+.team img{width:58px;height:58px}
+.score{font-size:34px}
+.event{grid-template-columns:1fr 48px 1fr}
+.event-box{font-size:12px;padding:8px}
 }
 </style>
 </head>
@@ -210,17 +46,15 @@ padding:8px;
 
 <header>
 <h1>PROLIGA MATCH CENTER</h1>
-<p>Live match details and statistics</p>
+<p>Live match details and timeline</p>
 </header>
 
 <main>
 
 <section class="card">
-
 <div class="match-top" id="matchInfo"></div>
 
 <div class="scoreboard">
-
 <div class="team">
 <img id="homeLogo">
 <div class="team-name" id="homeTeam"></div>
@@ -229,7 +63,7 @@ padding:8px;
 <div>
 <div class="score" id="score">- : -</div>
 <div style="text-align:center">
-<span class="status">FT</span>
+<span class="status" id="status">NS</span>
 </div>
 </div>
 
@@ -237,47 +71,19 @@ padding:8px;
 <img id="awayLogo">
 <div class="team-name" id="awayTeam"></div>
 </div>
-
 </div>
-
 </section>
 
 <section class="card">
-
 <h2>Match Timeline</h2>
-
-<div class="timeline">
-
-<div class="event">
-<div class="event-box event-left goal">⚽ Home Team</div>
-<div class="minute">14'</div>
-<div class="empty"></div>
-</div>
-
-<div class="event">
-<div class="empty"></div>
-<div class="minute">27'</div>
-<div class="event-box event-right goal">Away Team ⚽</div>
-</div>
-
-<div class="event">
-<div class="event-box event-left yellow">🟨 Home Team</div>
-<div class="minute">41'</div>
-<div class="empty"></div>
-</div>
-
-</div>
-
+<div class="timeline" id="timeline"></div>
 </section>
 
-<a class="back" href="index.html">
-← Back to ProLiga
-</a>
+<a class="back" href="index.html">← Back to ProLiga</a>
 
 </main>
 
 <script>
-
 const clubLogos={
 "Victoria FC":"Projekt bez nazwy_20260508_214403_0000.png",
 "Olimpia FC":"Projekt bez nazwy_20260508_214448_0000.png",
@@ -299,7 +105,6 @@ const officialScores={
 "1|Olympique Nova|Union Crest": {home: 3, away: 4},
 "1|Real Vanguardia|Virello": {home: 1, away: 6}
 },
-
 "ProLiga 2":{
 "1|Portfield United|Stalovia": {home: 5, away: 3},
 "1|Atletico Bellmont|Highmoor Rovers": {home: 3, away: 3},
@@ -309,12 +114,56 @@ const officialScores={
 }
 };
 
-const params=new URLSearchParams(window.location.search);
+const matchEvents={
+"ProLiga 1|1|Victoria FC|City Rangers":[
+{minute:"14'",team:"Victoria FC",type:"goal"},
+{minute:"27'",team:"City Rangers",type:"goal"},
+{minute:"76'",team:"Victoria FC",type:"goal"}
+],
 
+"ProLiga 1|1|Olimpia FC|Sporting Vale":[
+{minute:"9'",team:"Olimpia FC",type:"goal"},
+{minute:"22'",team:"Sporting Vale",type:"goal"},
+{minute:"39'",team:"Olimpia FC",type:"goal"},
+{minute:"44'",team:"Sporting Vale",type:"goal"},
+{minute:"61'",team:"Olimpia FC",type:"goal"},
+{minute:"72'",team:"Sporting Vale",type:"goal"},
+{minute:"80'",team:"Olimpia FC",type:"goal"},
+{minute:"88'",team:"Sporting Vale",type:"goal"}
+],
+
+"ProLiga 1|1|Royal Falcons|Inter Blaze":[
+{minute:"18'",team:"Royal Falcons",type:"goal"},
+{minute:"35'",team:"Inter Blaze",type:"goal"},
+{minute:"57'",team:"Royal Falcons",type:"goal"},
+{minute:"82'",team:"Inter Blaze",type:"goal"}
+],
+
+"ProLiga 1|1|Olympique Nova|Union Crest":[
+{minute:"11'",team:"Union Crest",type:"goal"},
+{minute:"24'",team:"Olympique Nova",type:"goal"},
+{minute:"38'",team:"Union Crest",type:"goal"},
+{minute:"51'",team:"Olympique Nova",type:"goal"},
+{minute:"67'",team:"Union Crest",type:"goal"},
+{minute:"74'",team:"Olympique Nova",type:"goal"},
+{minute:"89'",team:"Union Crest",type:"goal"}
+],
+
+"ProLiga 1|1|Real Vanguardia|Virello":[
+{minute:"5'",team:"Virello",type:"goal"},
+{minute:"18'",team:"Virello",type:"goal"},
+{minute:"31'",team:"Real Vanguardia",type:"goal"},
+{minute:"45'",team:"Virello",type:"goal"},
+{minute:"53'",team:"Virello",type:"goal"},
+{minute:"70'",team:"Virello",type:"goal"},
+{minute:"84'",team:"Virello",type:"goal"}
+]
+};
+
+const params=new URLSearchParams(window.location.search);
 const raw=params.get("id");
 
 if(raw){
-
 const parts=decodeURIComponent(raw).split("|");
 
 const league=parts[0];
@@ -322,28 +171,69 @@ const round=parts[1];
 const home=parts[2];
 const away=parts[3];
 
-document.getElementById("matchInfo").textContent=
-league+" • Matchday "+round;
-
+document.getElementById("matchInfo").textContent=league+" • Matchday "+round;
 document.getElementById("homeTeam").textContent=home;
 document.getElementById("awayTeam").textContent=away;
 
-document.getElementById("homeLogo").src=
-clubLogos[home] || "";
+document.getElementById("homeLogo").src=clubLogos[home] || "";
+document.getElementById("awayLogo").src=clubLogos[away] || "";
 
-document.getElementById("awayLogo").src=
-clubLogos[away] || "";
-
-const score=
-officialScores[league]?.[round+"|"+home+"|"+away];
+const score=officialScores[league]?.[round+"|"+home+"|"+away];
 
 if(score){
-document.getElementById("score").textContent=
-score.home+" : "+score.away;
+document.getElementById("score").textContent=score.home+" : "+score.away;
+document.getElementById("status").textContent="FT";
+}else{
+document.getElementById("score").textContent="- : -";
+document.getElementById("status").textContent="NS";
 }
 
+const timeline=document.getElementById("timeline");
+const eventKey=league+"|"+round+"|"+home+"|"+away;
+const events=matchEvents[eventKey] || [];
+
+timeline.innerHTML="";
+
+if(events.length===0){
+timeline.innerHTML='<p style="text-align:center;color:#94a3b8;">No events yet</p>';
 }
 
+events.forEach(event=>{
+const isHome=event.team===home;
+
+let icon="⚽";
+let className="goal";
+
+if(event.type==="yellow"){
+icon="🟨";
+className="yellow";
+}
+
+if(event.type==="red"){
+icon="🟥";
+className="red";
+}
+
+const row=document.createElement("div");
+row.className="event";
+
+if(isHome){
+row.innerHTML=`
+<div class="event-box event-left ${className}">${icon} ${event.team}</div>
+<div class="minute">${event.minute}</div>
+<div class="empty"></div>
+`;
+}else{
+row.innerHTML=`
+<div class="empty"></div>
+<div class="minute">${event.minute}</div>
+<div class="event-box event-right ${className}">${event.team} ${icon}</div>
+`;
+}
+
+timeline.appendChild(row);
+});
+}
 </script>
 
 </body>
