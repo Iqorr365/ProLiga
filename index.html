@@ -264,7 +264,8 @@ row.className="match";
   row.style.cursor="pointer";
 
 row.onclick=()=>{
-window.location.href="match.html";
+const id=encodeURIComponent(currentLeague+"|"+match.round+"|"+match.home+"|"+match.away);
+window.location.href="match.html?id="+id;
 };
 row.innerHTML=`
 <div class="home">${match.home}</div>
