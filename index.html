@@ -96,7 +96,7 @@ header h1{font-size:30px}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig={
 apiKey:"AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
 authDomain:"proliga-1c9c3.firebaseapp.com",
@@ -151,24 +151,39 @@ let currentLeague="ProLiga 1";
 async function loadFirebaseScores(){
 firebaseScores={};
 
-const querySnapshot=await getDocs(collection(db,"matches"));
+async function loadLeague(leagueName){
+const leagueTeams=leagues[leagueName];
+const leagueMatches=createSchedule(leagueTeams);
 
-querySnapshot.forEach((doc)=>{
-const data=doc.data();
+firebaseScores[leagueName]={};
 
-if(!data.league || data.round === undefined || !data.homeTeam || !data.awayTeam)return;
+for(const match of leagueMatches){
 
-const league=data.league;
-const key=String(data.round)+"|"+data.homeTeam+"|"+data.awayTeam;
+const matchId=
+match.home.toLowerCase().replaceAll(" ","-")
++"-"+
+match.away.toLowerCase().replaceAll(" ","-");
 
-if(!firebaseScores[league])firebaseScores[league]={};
+const matchRef=doc(db,"matches",matchId);
+const matchSnap=await getDoc(matchRef);
 
-firebaseScores[league][key]={
+if(matchSnap.exists()){
+const data=matchSnap.data();
+
+const key=match.round+"|"+match.home+"|"+match.away;
+
+firebaseScores[leagueName][key]={
 home:data.homeScore,
 away:data.awayScore,
 status:data.status || "FT"
 };
-});
+}
+
+}
+}
+
+await loadLeague("ProLiga 1");
+await loadLeague("ProLiga 2");
 }
 function createSchedule(teams){
 const firstHalf=[];
