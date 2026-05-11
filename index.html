@@ -11,50 +11,37 @@ body{margin:0;font-family:Arial,sans-serif;background:#f3f4f6;color:#111827}
 header{background:linear-gradient(135deg,#0f172a,#111827);color:white;padding:34px 16px;text-align:center}
 header h1{margin:0;font-size:38px;letter-spacing:1px}
 header p{margin:10px 0 0;color:#cbd5e1}
-
 main{max-width:1100px;margin:22px auto;padding:0 12px 40px}
-
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
 .tab{padding:14px;border:0;border-radius:14px;background:white;color:#0f172a;font-size:16px;font-weight:bold;box-shadow:0 4px 14px rgba(0,0,0,.08);cursor:pointer}
 .tab.active{background:#0f172a;color:white}
-
 .card{background:white;border-radius:18px;padding:18px;margin-bottom:22px;box-shadow:0 4px 16px rgba(0,0,0,.08);overflow-x:auto}
-
 h2{margin:0 0 14px;font-size:23px}
 .sub{color:#64748b;margin-top:-8px;margin-bottom:16px;font-size:14px}
-
 table{width:100%;border-collapse:collapse;min-width:780px}
 th,td{padding:11px 9px;border-bottom:1px solid #e5e7eb;text-align:center;font-size:14px}
 th{background:#f8fafc;color:#475569;font-size:12px;text-transform:uppercase}
-
 td.team{text-align:left;font-weight:bold;color:#111827;white-space:nowrap}
 .club-logo{width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-right:8px}
-
 .pos{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;font-weight:bold;color:white;background:#64748b}
 .promotion{background:#16a34a}
 .promotion2{background:#22c55e}
 .relegation{background:#dc2626}
-
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;color:#475569;font-size:14px}
 .dot{display:inline-block;width:13px;height:13px;border-radius:999px;margin-right:6px;vertical-align:-1px}
 .green{background:#16a34a}
 .green2{background:#22c55e}
 .red{background:#dc2626}
-
 .round{margin:20px 0 10px;padding:10px 12px;background:#0f172a;color:white;border-radius:10px;font-weight:bold}
-
 .match{display:grid;grid-template-columns:1fr 70px 1fr;gap:10px;align-items:center;padding:12px;border-radius:12px;background:#f8fafc;margin-bottom:9px}
 .home{text-align:right;font-weight:bold}
 .away{text-align:left;font-weight:bold}
-
 .score{text-align:center;font-weight:bold;background:white;border:1px solid #e5e7eb;border-radius:10px;padding:8px 4px;color:#0f172a}
 .not-played{color:#94a3b8;font-weight:normal}
-
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .info-box{background:#f8fafc;border-radius:14px;padding:14px;text-align:center}
 .info-box b{display:block;font-size:20px;color:#0f172a}
 .info-box span{color:#64748b;font-size:13px}
-
 @media(max-width:700px){
 header h1{font-size:30px}
 .info-grid{grid-template-columns:1fr}
@@ -66,14 +53,12 @@ header h1{font-size:30px}
 </head>
 
 <body>
-
 <header>
 <h1>PROLIGA</h1>
 <p>Official Competition Page - Season 2026</p>
 </header>
 
 <main>
-
 <section class="card">
 <h2>Competition Overview</h2>
 <div class="info-grid">
@@ -91,25 +76,14 @@ header h1{font-size:30px}
 <section class="card">
 <h2 id="tableTitle">Standings - ProLiga 1</h2>
 <p class="sub">M - matches, W - wins, D - draws, L - losses, GF - goals for, GA - goals against, GD - goal difference, PTS - points</p>
-
 <table>
 <thead>
 <tr>
-<th>#</th>
-<th>Club</th>
-<th>M</th>
-<th>W</th>
-<th>D</th>
-<th>L</th>
-<th>GF</th>
-<th>GA</th>
-<th>GD</th>
-<th>PTS</th>
+<th>#</th><th>Club</th><th>M</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>PTS</th>
 </tr>
 </thead>
 <tbody id="leagueTable"></tbody>
 </table>
-
 <div class="legend" id="legend"></div>
 </section>
 
@@ -118,35 +92,28 @@ header h1{font-size:30px}
 <p class="sub">Official fixtures and published results.</p>
 <div id="matches"></div>
 </section>
-
 </main>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
+authDomain:"proliga-1c9c3.firebaseapp.com",
+projectId:"proliga-1c9c3",
+storageBucket:"proliga-1c9c3.firebasestorage.app",
+messagingSenderId:"855885881253",
+appId:"1:855885881253:web:513f4eda5e65bf2ef9524c",
+measurementId:"G-87WHR4QBSL"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
 const leagues={
-"ProLiga 1":[
-"Victoria FC",
-"Olimpia FC",
-"Royal Falcons",
-"Olympique Nova",
-"Real Vanguardia",
-"Virello",
-"Union Crest",
-"Inter Blaze",
-"Sporting Vale",
-"City Rangers"
-],
-"ProLiga 2":[
-"Portfield United",
-"Atletico Bellmont",
-"Deportivo Vale",
-"Riverham FC",
-"Westport United",
-"Athletic Crown",
-"Albion Kingsport",
-"FC Southmoor",
-"Highmoor Rovers",
-"Stalovia"
-]
+"ProLiga 1":["Victoria FC","Olimpia FC","Royal Falcons","Olympique Nova","Real Vanguardia","Virello","Union Crest","Inter Blaze","Sporting Vale","City Rangers"],
+"ProLiga 2":["Portfield United","Atletico Bellmont","Deportivo Vale","Riverham FC","Westport United","Athletic Crown","Albion Kingsport","FC Southmoor","Highmoor Rovers","Stalovia"]
 };
 
 const clubLogos={
@@ -162,25 +129,48 @@ const clubLogos={
 "Inter Blaze":"Projekt bez nazwy_20260508_215133_0000.png"
 };
 
-const officialScores={
+const localScores={
 "ProLiga 1":{
-"1|Victoria FC|City Rangers": {home: 2, away: 1},
-"1|Olimpia FC|Sporting Vale": {home: 4, away: 4},
-"1|Royal Falcons|Inter Blaze": {home: 2, away: 2},
-"1|Olympique Nova|Union Crest": {home: 3, away: 4},
-"1|Real Vanguardia|Virello": {home: 1, away: 6}
+"1|Victoria FC|City Rangers":{home:2,away:1},
+"1|Olimpia FC|Sporting Vale":{home:4,away:4},
+"1|Royal Falcons|Inter Blaze":{home:2,away:2},
+"1|Olympique Nova|Union Crest":{home:3,away:4},
+"1|Real Vanguardia|Virello":{home:1,away:6}
 },
-
 "ProLiga 2":{
-"1|Portfield United|Stalovia": {home: 5, away: 3},
-"1|Atletico Bellmont|Highmoor Rovers": {home: 3, away: 3},
-"1|Deportivo Vale|FC Southmoor": {home: 2, away: 4},
-"1|Riverham FC|Albion Kingsport": {home: 4, away: 2},
-"1|Westport United|Athletic Crown": {home: 1, away: 2}
+"1|Portfield United|Stalovia":{home:5,away:3},
+"1|Atletico Bellmont|Highmoor Rovers":{home:3,away:3},
+"1|Deportivo Vale|FC Southmoor":{home:2,away:4},
+"1|Riverham FC|Albion Kingsport":{home:4,away:2},
+"1|Westport United|Athletic Crown":{home:1,away:2}
 }
 };
 
+let firebaseScores={};
 let currentLeague="ProLiga 1";
+
+async function loadFirebaseScores(){
+firebaseScores={};
+
+const querySnapshot=await getDocs(collection(db,"matches"));
+
+querySnapshot.forEach((doc)=>{
+const data=doc.data();
+
+if(!data.league || !data.round || !data.homeTeam || !data.awayTeam)return;
+
+const league=data.league;
+const key=data.round+"|"+data.homeTeam+"|"+data.awayTeam;
+
+if(!firebaseScores[league])firebaseScores[league]={};
+
+firebaseScores[league][key]={
+home:data.homeScore,
+away:data.awayScore,
+status:data.status || "FT"
+};
+});
+}
 
 function createSchedule(teams){
 const firstHalf=[];
@@ -219,27 +209,26 @@ return match.round+"|"+match.home+"|"+match.away;
 }
 
 function getScore(match){
-return officialScores[currentLeague][scoreKey(match)]||{home:null,away:null};
+return firebaseScores[currentLeague]?.[scoreKey(match)] || localScores[currentLeague]?.[scoreKey(match)] || {home:null,away:null};
 }
 
 let teams=leagues[currentLeague];
 let matches=createSchedule(teams);
 
-function switchLeague(name){
+window.switchLeague=function(name){
 currentLeague=name;
 teams=leagues[currentLeague];
 matches=createSchedule(teams);
 
 document.getElementById("tableTitle").textContent="Standings - "+currentLeague;
 document.getElementById("fixturesTitle").textContent="Fixtures & Results - "+currentLeague;
-
 document.getElementById("tab1").classList.toggle("active",currentLeague==="ProLiga 1");
 document.getElementById("tab2").classList.toggle("active",currentLeague==="ProLiga 2");
 
 renderMatches();
 renderTable();
 renderLegend();
-}
+};
 
 function renderMatches(){
 const box=document.getElementById("matches");
@@ -261,17 +250,19 @@ const scoreText=hasScore?score.home+" : "+score.away:"-";
 
 const row=document.createElement("div");
 row.className="match";
-  row.style.cursor="pointer";
+row.style.cursor="pointer";
 
 row.onclick=()=>{
 const id=encodeURIComponent(currentLeague+"|"+match.round+"|"+match.home+"|"+match.away);
 window.location.href="match.html?id="+id;
 };
+
 row.innerHTML=`
 <div class="home">${match.home}</div>
 <div class="score ${hasScore?"":"not-played"}">${scoreText}</div>
 <div class="away">${match.away}</div>
 `;
+
 box.appendChild(row);
 });
 }
@@ -357,9 +348,7 @@ if(currentLeague==="ProLiga 2"){
 if(position<=3)posClass+=" promotion2";
 }
 
-const logo=clubLogos[team.name]
-? `<img src="${clubLogos[team.name]}" class="club-logo">`
-: "";
+const logo=clubLogos[team.name]?`<img src="${clubLogos[team.name]}" class="club-logo">`:"";
 
 const row=document.createElement("tr");
 
@@ -397,10 +386,11 @@ legend.innerHTML=`
 }
 }
 
+await loadFirebaseScores();
 renderMatches();
 renderTable();
 renderLegend();
 </script>
 
 </body>
-  </html>
+</html>
