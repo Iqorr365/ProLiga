@@ -170,30 +170,6 @@ border-color:#dc2626;
 visibility:hidden;
 }
 
-.stats-row{
-display:grid;
-grid-template-columns:1fr 80px 1fr;
-gap:10px;
-align-items:center;
-margin:12px 0;
-}
-
-.stat-name{
-text-align:center;
-color:#94a3b8;
-font-size:13px;
-}
-
-.left-val{
-text-align:right;
-font-weight:bold;
-}
-
-.right-val{
-text-align:left;
-font-weight:bold;
-}
-
 .back{
 display:block;
 text-align:center;
@@ -241,27 +217,25 @@ padding:8px;
 
 <section class="card">
 
-<div class="match-top">
-ProLiga 1 • Matchday 1
-</div>
+<div class="match-top" id="matchInfo"></div>
 
 <div class="scoreboard">
 
 <div class="team">
-<img src="Projekt bez nazwy_20260508_214403_0000.png">
-<div class="team-name">Victoria FC</div>
+<img id="homeLogo">
+<div class="team-name" id="homeTeam"></div>
 </div>
 
 <div>
-<div class="score">2 : 1</div>
+<div class="score" id="score">- : -</div>
 <div style="text-align:center">
 <span class="status">FT</span>
 </div>
 </div>
 
 <div class="team">
-<img src="Projekt bez nazwy_20260508_215405_0000.png">
-<div class="team-name">City Rangers</div>
+<img id="awayLogo">
+<div class="team-name" id="awayTeam"></div>
 </div>
 
 </div>
@@ -275,7 +249,7 @@ ProLiga 1 • Matchday 1
 <div class="timeline">
 
 <div class="event">
-<div class="event-box event-left goal">⚽ Victoria FC</div>
+<div class="event-box event-left goal">⚽ Home Team</div>
 <div class="minute">14'</div>
 <div class="empty"></div>
 </div>
@@ -283,57 +257,15 @@ ProLiga 1 • Matchday 1
 <div class="event">
 <div class="empty"></div>
 <div class="minute">27'</div>
-<div class="event-box event-right goal">City Rangers ⚽</div>
+<div class="event-box event-right goal">Away Team ⚽</div>
 </div>
 
 <div class="event">
-<div class="event-box event-left yellow">🟨 Victoria FC</div>
+<div class="event-box event-left yellow">🟨 Home Team</div>
 <div class="minute">41'</div>
 <div class="empty"></div>
 </div>
 
-<div class="event">
-<div class="event-box event-left goal">⚽ Victoria FC</div>
-<div class="minute">76'</div>
-<div class="empty"></div>
-</div>
-
-<div class="event">
-<div class="empty"></div>
-<div class="minute">88'</div>
-<div class="event-box event-right red">City Rangers 🟥</div>
-</div>
-
-</div>
-
-</section>
-
-<section class="card">
-
-<h2>Match Statistics</h2>
-
-<div class="stats-row">
-<div class="left-val">54%</div>
-<div class="stat-name">Possession</div>
-<div class="right-val">46%</div>
-</div>
-
-<div class="stats-row">
-<div class="left-val">12</div>
-<div class="stat-name">Shots</div>
-<div class="right-val">8</div>
-</div>
-
-<div class="stats-row">
-<div class="left-val">6</div>
-<div class="stat-name">Shots on Target</div>
-<div class="right-val">3</div>
-</div>
-
-<div class="stats-row">
-<div class="left-val">5</div>
-<div class="stat-name">Corners</div>
-<div class="right-val">4</div>
 </div>
 
 </section>
@@ -344,5 +276,75 @@ ProLiga 1 • Matchday 1
 
 </main>
 
+<script>
+
+const clubLogos={
+"Victoria FC":"Projekt bez nazwy_20260508_214403_0000.png",
+"Olimpia FC":"Projekt bez nazwy_20260508_214448_0000.png",
+"City Rangers":"Projekt bez nazwy_20260508_215405_0000.png",
+"Royal Falcons":"Projekt bez nazwy_20260508_214638_0000.png",
+"Sporting Vale":"Projekt bez nazwy_20260508_215323_0000.png",
+"Virello":"Projekt bez nazwy_20260508_214902_0000.png",
+"Union Crest":"Projekt bez nazwy_20260508_215049_0000.png",
+"Real Vanguardia":"Projekt bez nazwy_20260508_214803_0000.png",
+"Olympique Nova":"Projekt bez nazwy_20260508_214723_0000.png",
+"Inter Blaze":"Projekt bez nazwy_20260508_215133_0000.png"
+};
+
+const officialScores={
+"ProLiga 1":{
+"1|Victoria FC|City Rangers": {home: 2, away: 1},
+"1|Olimpia FC|Sporting Vale": {home: 4, away: 4},
+"1|Royal Falcons|Inter Blaze": {home: 2, away: 2},
+"1|Olympique Nova|Union Crest": {home: 3, away: 4},
+"1|Real Vanguardia|Virello": {home: 1, away: 6}
+},
+
+"ProLiga 2":{
+"1|Portfield United|Stalovia": {home: 5, away: 3},
+"1|Atletico Bellmont|Highmoor Rovers": {home: 3, away: 3},
+"1|Deportivo Vale|FC Southmoor": {home: 2, away: 4},
+"1|Riverham FC|Albion Kingsport": {home: 4, away: 2},
+"1|Westport United|Athletic Crown": {home: 1, away: 2}
+}
+};
+
+const params=new URLSearchParams(window.location.search);
+
+const raw=params.get("id");
+
+if(raw){
+
+const parts=decodeURIComponent(raw).split("|");
+
+const league=parts[0];
+const round=parts[1];
+const home=parts[2];
+const away=parts[3];
+
+document.getElementById("matchInfo").textContent=
+league+" • Matchday "+round;
+
+document.getElementById("homeTeam").textContent=home;
+document.getElementById("awayTeam").textContent=away;
+
+document.getElementById("homeLogo").src=
+clubLogos[home] || "";
+
+document.getElementById("awayLogo").src=
+clubLogos[away] || "";
+
+const score=
+officialScores[league]?.[round+"|"+home+"|"+away];
+
+if(score){
+document.getElementById("score").textContent=
+score.home+" : "+score.away;
+}
+
+}
+
+</script>
+
 </body>
-  </html>
+</html>
