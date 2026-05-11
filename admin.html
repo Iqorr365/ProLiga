@@ -146,8 +146,8 @@ document.getElementById("saveBtn").onclick=async()=>{
 
 const league=document.getElementById("league").value;
 const round=Number(document.getElementById("round").value);
-const homeTeam=document.getElementById("homeTeam").value;
-const awayTeam=document.getElementById("awayTeam").value;
+const homeTeam=document.getElementById("homeTeam").value.trim();
+const awayTeam=document.getElementById("awayTeam").value.trim();
 const homeScore=Number(document.getElementById("homeScore").value);
 const awayScore=Number(document.getElementById("awayScore").value);
 const status=document.getElementById("status").value;
