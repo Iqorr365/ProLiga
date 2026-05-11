@@ -399,10 +399,19 @@ legend.innerHTML=`
 }
 }
 
-await loadFirebaseScores();
 renderMatches();
 renderTable();
 renderLegend();
+
+loadFirebaseScores()
+.then(()=>{
+renderMatches();
+renderTable();
+renderLegend();
+})
+.catch((error)=>{
+console.log("Firebase error:", error);
+});
 </script>
 
 </body>
