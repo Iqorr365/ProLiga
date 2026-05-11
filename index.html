@@ -157,11 +157,9 @@ const querySnapshot=await getDocs(collection(db,"matches"));
 querySnapshot.forEach((doc)=>{
 const data=doc.data();
 
-if(!data.league || !data.round || !data.homeTeam || !data.awayTeam)return;
-
+if(!data.league || data.round === undefined || !data.homeTeam || !data.awayTeam)return;
 const league=data.league;
-const key=data.round+"|"+data.homeTeam+"|"+data.awayTeam;
-
+const key=String(data.round)+"|"+data.homeTeam+"|"+data.awayTeam;
 if(!firebaseScores[league])firebaseScores[league]={};
 
 firebaseScores[league][key]={
