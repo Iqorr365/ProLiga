@@ -108,6 +108,23 @@ const clubLogos={
 "Inter Blaze":"Projekt bez nazwy_20260508_215133_0000.png"
 };
 
+const localScores={
+"ProLiga 1":{
+"1|Victoria FC|City Rangers":{home:2,away:1},
+"1|Olimpia FC|Sporting Vale":{home:4,away:4},
+"1|Royal Falcons|Inter Blaze":{home:2,away:2},
+"1|Olympique Nova|Union Crest":{home:3,away:4},
+"1|Real Vanguardia|Virello":{home:1,away:6}
+},
+"ProLiga 2":{
+"1|Portfield United|Stalovia":{home:5,away:3},
+"1|Atletico Bellmont|Highmoor Rovers":{home:3,away:3},
+"1|Deportivo Vale|FC Southmoor":{home:2,away:4},
+"1|Riverham FC|Albion Kingsport":{home:4,away:2},
+"1|Westport United|Athletic Crown":{home:1,away:2}
+}
+};
+  
 let scores={};
 let currentLeague="ProLiga 1";
 let teams=leagues[currentLeague];
@@ -149,7 +166,7 @@ return String(match.round)+"|"+match.home+"|"+match.away;
 }
 
 function getScore(match){
-return scores[currentLeague]?.[scoreKey(match)] || {home:null,away:null};
+return scores[currentLeague]?.[scoreKey(match)] || localScores[currentLeague]?.[scoreKey(match)] || {home:null,away:null};
 }
 
 async function loadScoresFromFirebase(){
