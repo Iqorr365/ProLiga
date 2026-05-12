@@ -73,7 +73,23 @@ td.team{text-align:left;font-weight:bold;white-space:nowrap}
 </section>
 </main>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
+authDomain:"proliga-1c9c3.firebaseapp.com",
+projectId:"proliga-1c9c3",
+storageBucket:"proliga-1c9c3.firebasestorage.app",
+messagingSenderId:"855885881253",
+appId:"1:855885881253:web:513f4eda5e65bf2ef9524c",
+measurementId:"G-87WHR4QBSL"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
 const leagues={
 "ProLiga 1":["Victoria FC","Olimpia FC","Royal Falcons","Olympique Nova","Real Vanguardia","Virello","Union Crest","Inter Blaze","Sporting Vale","City Rangers"],
 "ProLiga 2":["Portfield United","Atletico Bellmont","Deportivo Vale","Riverham FC","Westport United","Athletic Crown","Albion Kingsport","FC Southmoor","Highmoor Rovers","Stalovia"]
@@ -92,97 +108,253 @@ const clubLogos={
 "Inter Blaze":"Projekt bez nazwy_20260508_215133_0000.png"
 };
 
-const scores={
-"ProLiga 1":{
-"1|Victoria FC|City Rangers":{home:2,away:1},
-"1|Olimpia FC|Sporting Vale":{home:4,away:4},
-"1|Royal Falcons|Inter Blaze":{home:2,away:2},
-"1|Olympique Nova|Union Crest":{home:3,away:4},
-"1|Real Vanguardia|Virello":{home:1,away:6}
-},
-"ProLiga 2":{
-"1|Portfield United|Stalovia":{home:5,away:3},
-"1|Atletico Bellmont|Highmoor Rovers":{home:3,away:3},
-"1|Deportivo Vale|FC Southmoor":{home:2,away:4},
-"1|Riverham FC|Albion Kingsport":{home:4,away:2},
-"1|Westport United|Athletic Crown":{home:1,away:2}
-}
-};
-
+let scores={};
 let currentLeague="ProLiga 1";
 let teams=leagues[currentLeague];
 let matches=createSchedule(teams);
 
 function createSchedule(teams){
 const firstHalf=[],arr=[...teams],rounds=arr.length-1,half=arr.length/2;
+
 for(let round=0;round<rounds;round++){
 for(let i=0;i<half;i++){
 let home=arr[i],away=arr[arr.length-1-i];
-if(round%2===1){let temp=home;home=away;away=temp}
+
+if(round%2===1){
+let temp=home;
+home=away;
+away=temp;
+}
+
 firstHalf.push({home,away,round:round+1});
 }
 arr.splice(1,0,arr.pop());
 }
-const secondHalf=firstHalf.map(m=>({home:m.away,away:m.home,round:m.round+rounds}));
+
+const secondHalf=firstHalf.map(m=>({
+home:m.away,
+away:m.home,
+round:m.round+rounds
+}));
+
 return[...firstHalf,...secondHalf];
 }
 
-function scoreKey(match){return match.round+"|"+match.home+"|"+match.away}
-function getScore(match){return scores[currentLeague]?.[scoreKey(match)]||{home:null,away:null}}
+function cleanText(value){
+return String(value || "").trim();
+}
 
-function switchLeague(name){
-currentLeague=name;teams=leagues[currentLeague];matches=createSchedule(teams);
+function scoreKey(match){
+return String(match.round)+"|"+match.home+"|"+match.away;
+}
+
+function getScore(match){
+return scores[currentLeague]?.[scoreKey(match)] || {home:null,away:null};
+}
+
+async function loadScoresFromFirebase(){
+scores={};
+
+const snapshot=await getDocs(collection(db,"matches"));
+
+snapshot.forEach(item=>{
+const data=item.data();
+
+const league=cleanText(data.league);
+const round=cleanText(data.round);
+const homeTeam=cleanText(data.homeTeam);
+const awayTeam=cleanText(data.awayTeam);
+
+if(!league || !round || !homeTeam || !awayTeam)return;
+
+if(!scores[league])scores[league]={};
+
+const key=round+"|"+homeTeam+"|"+awayTeam;
+
+scores[league][key]={
+home:data.homeScore,
+away:data.awayScore,
+status:data.status || "FT"
+};
+});
+}
+
+window.switchLeague=function(name){
+currentLeague=name;
+teams=leagues[currentLeague];
+matches=createSchedule(teams);
+
 document.getElementById("tableTitle").textContent="Standings - "+currentLeague;
 document.getElementById("fixturesTitle").textContent="Fixtures & Results - "+currentLeague;
 document.getElementById("tab1").classList.toggle("active",currentLeague==="ProLiga 1");
 document.getElementById("tab2").classList.toggle("active",currentLeague==="ProLiga 2");
-renderMatches();renderTable();renderLegend();
-}
+
+renderMatches();
+renderTable();
+renderLegend();
+};
 
 function renderMatches(){
-const box=document.getElementById("matches");box.innerHTML="";let lastRound=0;
+const box=document.getElementById("matches");
+box.innerHTML="";
+let lastRound=0;
+
 matches.forEach(match=>{
-if(match.round!==lastRound){lastRound=match.round;const title=document.createElement("div");title.className="round";title.textContent="Matchday "+match.round;box.appendChild(title)}
-const score=getScore(match),hasScore=score.home!==null&&score.away!==null;
-const row=document.createElement("div");row.className="match";
-row.onclick=()=>{const id=encodeURIComponent(currentLeague+"|"+match.round+"|"+match.home+"|"+match.away);window.location.href="match.html?id="+id};
-row.innerHTML=`<div class="home">${match.home}</div><div class="score ${hasScore?"":"not-played"}">${hasScore?score.home+" : "+score.away:"-"}</div><div class="away">${match.away}</div>`;
+if(match.round!==lastRound){
+lastRound=match.round;
+const title=document.createElement("div");
+title.className="round";
+title.textContent="Matchday "+match.round;
+box.appendChild(title);
+}
+
+const score=getScore(match);
+const hasScore=score.home!==null&&score.away!==null&&score.home!==undefined&&score.away!==undefined;
+
+const row=document.createElement("div");
+row.className="match";
+
+row.onclick=()=>{
+const id=encodeURIComponent(currentLeague+"|"+match.round+"|"+match.home+"|"+match.away);
+window.location.href="match.html?id="+id;
+};
+
+row.innerHTML=`
+<div class="home">${match.home}</div>
+<div class="score ${hasScore?"":"not-played"}">${hasScore?score.home+" : "+score.away:"-"}</div>
+<div class="away">${match.away}</div>
+`;
+
 box.appendChild(row);
 });
 }
 
 function renderTable(){
 const stats={};
-teams.forEach(t=>stats[t]={name:t,played:0,wins:0,draws:0,losses:0,goalsFor:0,goalsAgainst:0,points:0});
-matches.forEach(match=>{
-const score=getScore(match);if(score.home===null||score.away===null)return;
-const h=Number(score.home),a=Number(score.away),home=stats[match.home],away=stats[match.away];
-home.played++;away.played++;home.goalsFor+=h;home.goalsAgainst+=a;away.goalsFor+=a;away.goalsAgainst+=h;
-if(h>a){home.wins++;home.points+=3;away.losses++}
-else if(h<a){away.wins++;away.points+=3;home.losses++}
-else{home.draws++;away.draws++;home.points++;away.points++}
+
+teams.forEach(t=>stats[t]={
+name:t,
+played:0,
+wins:0,
+draws:0,
+losses:0,
+goalsFor:0,
+goalsAgainst:0,
+points:0
 });
-const sorted=Object.values(stats).sort((a,b)=>b.points-a.points||((b.goalsFor-b.goalsAgainst)-(a.goalsFor-a.goalsAgainst))||b.goalsFor-a.goalsFor||a.name.localeCompare(b.name));
-const tbody=document.getElementById("leagueTable");tbody.innerHTML="";
+
+matches.forEach(match=>{
+const score=getScore(match);
+if(score.home===null||score.away===null||score.home===undefined||score.away===undefined)return;
+
+const h=Number(score.home);
+const a=Number(score.away);
+
+if(Number.isNaN(h)||Number.isNaN(a))return;
+
+const home=stats[match.home];
+const away=stats[match.away];
+
+home.played++;
+away.played++;
+
+home.goalsFor+=h;
+home.goalsAgainst+=a;
+away.goalsFor+=a;
+away.goalsAgainst+=h;
+
+if(h>a){
+home.wins++;
+home.points+=3;
+away.losses++;
+}else if(h<a){
+away.wins++;
+away.points+=3;
+home.losses++;
+}else{
+home.draws++;
+away.draws++;
+home.points++;
+away.points++;
+}
+});
+
+const sorted=Object.values(stats).sort((a,b)=>{
+if(b.points!==a.points)return b.points-a.points;
+
+const gdA=a.goalsFor-a.goalsAgainst;
+const gdB=b.goalsFor-b.goalsAgainst;
+
+if(gdB!==gdA)return gdB-gdA;
+if(b.goalsFor!==a.goalsFor)return b.goalsFor-a.goalsFor;
+
+return a.name.localeCompare(b.name);
+});
+
+const tbody=document.getElementById("leagueTable");
+tbody.innerHTML="";
+
 sorted.forEach((team,index)=>{
-const pos=index+1,gd=team.goalsFor-team.goalsAgainst;
+const pos=index+1;
+const gd=team.goalsFor-team.goalsAgainst;
+
 let posClass="pos";
-if(currentLeague==="ProLiga 1"){if(pos<=4)posClass+=" promotion";if(pos>=8)posClass+=" relegation"}
-if(currentLeague==="ProLiga 2"){if(pos<=3)posClass+=" promotion2"}
+
+if(currentLeague==="ProLiga 1"){
+if(pos<=4)posClass+=" promotion";
+if(pos>=8)posClass+=" relegation";
+}
+
+if(currentLeague==="ProLiga 2"){
+if(pos<=3)posClass+=" promotion2";
+}
+
 const logo=clubLogos[team.name]?`<img src="${clubLogos[team.name]}" class="club-logo">`:"";
+
 const row=document.createElement("tr");
-row.innerHTML=`<td><span class="${posClass}">${pos}</span></td><td class="team">${logo}${team.name}</td><td>${team.played}</td><td>${team.wins}</td><td>${team.draws}</td><td>${team.losses}</td><td>${team.goalsFor}</td><td>${team.goalsAgainst}</td><td>${gd}</td><td><b>${team.points}</b></td>`;
+
+row.innerHTML=`
+<td><span class="${posClass}">${pos}</span></td>
+<td class="team">${logo}${team.name}</td>
+<td>${team.played}</td>
+<td>${team.wins}</td>
+<td>${team.draws}</td>
+<td>${team.losses}</td>
+<td>${team.goalsFor}</td>
+<td>${team.goalsAgainst}</td>
+<td>${gd}</td>
+<td><b>${team.points}</b></td>
+`;
+
 tbody.appendChild(row);
 });
 }
 
 function renderLegend(){
 const legend=document.getElementById("legend");
-if(currentLeague==="ProLiga 1")legend.innerHTML=`<span><i class="dot green"></i>Championship Playoffs</span><span><i class="dot red"></i>Relegation Zone</span>`;
-if(currentLeague==="ProLiga 2")legend.innerHTML=`<span><i class="dot green2"></i>Direct Promotion</span>`;
+
+if(currentLeague==="ProLiga 1"){
+legend.innerHTML=`<span><i class="dot green"></i>Championship Playoffs</span><span><i class="dot red"></i>Relegation Zone</span>`;
 }
 
-renderMatches();renderTable();renderLegend();
+if(currentLeague==="ProLiga 2"){
+legend.innerHTML=`<span><i class="dot green2"></i>Direct Promotion</span>`;
+}
+}
+
+renderMatches();
+renderTable();
+renderLegend();
+
+loadScoresFromFirebase()
+.then(()=>{
+renderMatches();
+renderTable();
+renderLegend();
+})
+.catch(error=>{
+console.log("Firebase error:",error);
+});
 </script>
 
 </body>
