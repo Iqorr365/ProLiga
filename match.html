@@ -113,9 +113,11 @@ const clubLogos={
 "Inter Blaze":"Projekt bez nazwy_20260508_215133_0000.png"
 };
 
-const firebaseMatchIds={
-"ProLiga 1|1|Victoria FC|City Rangers":"victoria-city"
-};
+function makeMatchId(home,away){
+return home.toLowerCase().trim().replaceAll(" ","-")
++"-"+
+away.toLowerCase().trim().replaceAll(" ","-");
+}
 
 const localScores={
 "ProLiga 1":{
@@ -163,7 +165,7 @@ const matchKey=league+"|"+round+"|"+home+"|"+away;
 let score=null;
 let status="NS";
 
-const firebaseId=firebaseMatchIds[matchKey];
+const firebaseId=makeMatchId(home,away);
 
 if(firebaseId){
 const matchRef=doc(db,"matches",firebaseId);
