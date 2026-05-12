@@ -4,79 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ProLiga Admin Panel</title>
-
 <style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#0f172a;
-color:white;
-padding:20px;
-}
-
-.container{
-max-width:700px;
-margin:auto;
-}
-
-.card{
-background:#111827;
-border:1px solid #334155;
-border-radius:20px;
-padding:20px;
-margin-bottom:20px;
-}
-
-h1{
-margin-top:0;
-font-size:32px;
-}
-
-label{
-display:block;
-margin-bottom:8px;
-font-size:14px;
-color:#cbd5e1;
-}
-
-input,select{
-width:100%;
-padding:12px;
-border-radius:12px;
-border:1px solid #334155;
-background:#0f172a;
-color:white;
-margin-bottom:16px;
-font-size:15px;
-box-sizing:border-box;
-}
-
-button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:14px;
-background:#16a34a;
-color:white;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.success{
-margin-top:14px;
-color:#4ade80;
-text-align:center;
-font-weight:bold;
-}
+body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:white;padding:20px}
+.container{max-width:700px;margin:auto}
+.card{background:#111827;border:1px solid #334155;border-radius:20px;padding:20px;margin-bottom:20px}
+h1,h2{margin-top:0}
+label{display:block;margin-bottom:8px;font-size:14px;color:#cbd5e1}
+input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:white;margin-bottom:16px;font-size:15px;box-sizing:border-box}
+button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a;color:white;font-size:16px;font-weight:bold;cursor:pointer;margin-top:6px}
+.event-btn{background:#2563eb}
+.success{margin-top:14px;color:#4ade80;text-align:center;font-weight:bold}
 </style>
 </head>
 
 <body>
-
 <div class="container">
-<div class="card">
 
+<div class="card">
 <h1>ProLiga Admin</h1>
 
 <label>League</label>
@@ -103,20 +47,34 @@ font-weight:bold;
 </select>
 
 <button id="saveBtn">Save Match</button>
-
 <div class="success" id="success"></div>
-
 </div>
+
+<div class="card">
+<h2>Add Match Event</h2>
+
+<label>Minute</label>
+<input type="number" id="eventMinute" placeholder="14">
+
+<label>Team</label>
+<select id="eventTeam"></select>
+
+<label>Event Type</label>
+<select id="eventType">
+<option value="goal">Goal</option>
+<option value="yellow">Yellow Card</option>
+<option value="red">Red Card</option>
+</select>
+
+<button class="event-btn" id="eventBtn">Add Event</button>
+<div class="success" id="eventSuccess"></div>
+</div>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getFirestore,
-doc,
-setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
@@ -132,30 +90,8 @@ const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 
 const leagues={
-"ProLiga 1":[
-"Victoria FC",
-"Olimpia FC",
-"Royal Falcons",
-"Olympique Nova",
-"Real Vanguardia",
-"Virello",
-"Union Crest",
-"Inter Blaze",
-"Sporting Vale",
-"City Rangers"
-],
-"ProLiga 2":[
-"Portfield United",
-"Atletico Bellmont",
-"Deportivo Vale",
-"Riverham FC",
-"Westport United",
-"Athletic Crown",
-"Albion Kingsport",
-"FC Southmoor",
-"Highmoor Rovers",
-"Stalovia"
-]
+"ProLiga 1":["Victoria FC","Olimpia FC","Royal Falcons","Olympique Nova","Real Vanguardia","Virello","Union Crest","Inter Blaze","Sporting Vale","City Rangers"],
+"ProLiga 2":["Portfield United","Atletico Bellmont","Deportivo Vale","Riverham FC","Westport United","Athletic Crown","Albion Kingsport","FC Southmoor","Highmoor Rovers","Stalovia"]
 };
 
 function createSchedule(teams){
@@ -175,11 +111,7 @@ home=away;
 away=temp;
 }
 
-firstHalf.push({
-home,
-away,
-round:round+1
-});
+firstHalf.push({home,away,round:round+1});
 }
 
 arr.splice(1,0,arr.pop());
@@ -195,9 +127,25 @@ return[...firstHalf,...secondHalf];
 }
 
 function makeMatchId(home,away){
-return home.toLowerCase().trim().replaceAll(" ","-")
-+"-"+
-away.toLowerCase().trim().replaceAll(" ","-");
+return home.toLowerCase().trim().replaceAll(" ","-")+"-"+away.toLowerCase().trim().replaceAll(" ","-");
+}
+
+function getSelectedMatch(){
+return JSON.parse(document.getElementById("matchSelect").value);
+}
+
+function updateEventTeams(){
+const selected=getSelectedMatch();
+const eventTeam=document.getElementById("eventTeam");
+
+eventTeam.innerHTML="";
+
+[selected.homeTeam,selected.awayTeam].forEach(team=>{
+const option=document.createElement("option");
+option.value=team;
+option.textContent=team;
+eventTeam.appendChild(option);
+});
 }
 
 function loadMatches(){
@@ -218,18 +166,19 @@ homeTeam:match.home,
 awayTeam:match.away
 });
 
-option.textContent=
-"Matchday "+match.round+" | "+match.home+" vs "+match.away;
+option.textContent="Matchday "+match.round+" | "+match.home+" vs "+match.away;
 
 select.appendChild(option);
 });
+
+updateEventTeams();
 }
 
 document.getElementById("league").onchange=loadMatches;
+document.getElementById("matchSelect").onchange=updateEventTeams;
 
 document.getElementById("saveBtn").onclick=async()=>{
-
-const selected=JSON.parse(document.getElementById("matchSelect").value);
+const selected=getSelectedMatch();
 
 const league=selected.league;
 const round=Number(selected.round);
@@ -250,10 +199,44 @@ awayTeam,
 homeScore,
 awayScore,
 status
-});
+},{merge:true});
 
-document.getElementById("success").textContent=
-"Saved: "+homeTeam+" "+homeScore+" - "+awayScore+" "+awayTeam;
+document.getElementById("success").textContent="Saved: "+homeTeam+" "+homeScore+" - "+awayScore+" "+awayTeam;
+};
+
+document.getElementById("eventBtn").onclick=async()=>{
+const selected=getSelectedMatch();
+
+const league=selected.league;
+const round=Number(selected.round);
+const homeTeam=selected.homeTeam;
+const awayTeam=selected.awayTeam;
+
+const minute=document.getElementById("eventMinute").value;
+const team=document.getElementById("eventTeam").value;
+const type=document.getElementById("eventType").value;
+
+if(!minute){
+document.getElementById("eventSuccess").textContent="Enter minute first.";
+return;
+}
+
+const matchId=makeMatchId(homeTeam,awayTeam);
+
+await setDoc(doc(db,"matches",matchId),{
+league,
+round,
+homeTeam,
+awayTeam,
+events:arrayUnion({
+minute:minute+"'",
+team,
+type
+})
+},{merge:true});
+
+document.getElementById("eventSuccess").textContent="Event added: "+minute+"' "+team+" "+type;
+document.getElementById("eventMinute").value="";
 };
 
 loadMatches();
