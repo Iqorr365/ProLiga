@@ -198,6 +198,10 @@ const status=document.getElementById("status").value;
 
 const matchId=makeMatchId(homeTeam,awayTeam);
 
+const homeScore=Number(document.getElementById("homeScore").value);
+const awayScore=Number(document.getElementById("awayScore").value);
+const status=document.getElementById("status").value;
+
 await setDoc(doc(db,"matches",matchId),{
 league,
 round,
@@ -205,7 +209,12 @@ homeTeam,
 awayTeam,
 homeScore,
 awayScore,
-status
+status,
+events:arrayUnion({
+minute:minute+"'",
+team,
+type
+})
 },{merge:true});
 
 document.getElementById("success").textContent="Saved: "+homeTeam+" "+homeScore+" - "+awayScore+" "+awayTeam;
