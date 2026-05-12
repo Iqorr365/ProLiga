@@ -53,6 +53,8 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 <div class="card">
 <h2>Add Match Event</h2>
 
+<h3 id="selectedMatchInfo" style="color:#93c5fd;margin-top:-6px;margin-bottom:16px;"></h3>
+
 <label>Minute</label>
 <input type="number" id="eventMinute" placeholder="14">
 
@@ -136,6 +138,10 @@ return JSON.parse(document.getElementById("matchSelect").value);
 
 function updateEventTeams(){
 const selected=getSelectedMatch();
+
+document.getElementById("selectedMatchInfo").textContent=
+selected.homeTeam+" vs "+selected.awayTeam;
+
 const eventTeam=document.getElementById("eventTeam");
 
 eventTeam.innerHTML="";
@@ -147,7 +153,6 @@ option.textContent=team;
 eventTeam.appendChild(option);
 });
 }
-
 function loadMatches(){
 const league=document.getElementById("league").value;
 const teams=leagues[league];
