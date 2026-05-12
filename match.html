@@ -136,8 +136,6 @@ const localScores={
 }
 };
 
-const matchEvents={};
-
 const params=new URLSearchParams(window.location.search);
 const raw=params.get("id");
 
@@ -155,21 +153,28 @@ document.getElementById("awayTeam").textContent=away;
 document.getElementById("homeLogo").src=clubLogos[home] || "";
 document.getElementById("awayLogo").src=clubLogos[away] || "";
 
-const matchKey=league+"|"+round+"|"+home+"|"+away;
 let score=null;
 let status="NS";
+let events=[];
 
 const firebaseId=makeMatchId(home,away);
 
-if(firebaseId){
+try{
 const matchRef=doc(db,"matches",firebaseId);
 const matchSnap=await getDoc(matchRef);
 
 if(matchSnap.exists()){
 const data=matchSnap.data();
+
+if(data.homeScore !== undefined && data.awayScore !== undefined){
 score={home:data.homeScore,away:data.awayScore};
-status=data.status || "FT";
 }
+
+status=data.status || "FT";
+events=data.events || [];
+}
+}catch(error){
+console.log("Firebase error:",error);
 }
 
 if(!score){
@@ -186,21 +191,13 @@ document.getElementById("status").textContent="NS";
 }
 
 const timeline=document.getElementById("timeline");
-let events=[];
-
-if(firebaseId && matchSnap.exists()){
-const data=matchSnap.data();
-events=data.events || [];
-}
-
-if(events.length===0){
-events=matchEvents[matchKey] || [];
-}
 timeline.innerHTML="";
 
 if(events.length===0){
 timeline.innerHTML='<p style="text-align:center;color:#94a3b8;">No events yet</p>';
 }
+
+events.sort((a,b)=>parseInt(a.minute)-parseInt(b.minute));
 
 events.forEach(event=>{
 const isHome=event.team===home;
