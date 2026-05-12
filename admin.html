@@ -16,8 +16,8 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 .success{margin-top:14px;color:#4ade80;text-align:center;font-weight:bold}
 </style>
 </head>
-
 <body>
+
 <div class="container">
 
 <div class="card">
@@ -52,7 +52,6 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 
 <div class="card">
 <h2>Add Match Event</h2>
-
 <h3 id="selectedMatchInfo" style="color:#93c5fd;margin-top:-6px;margin-bottom:16px;"></h3>
 
 <label>Minute</label>
@@ -145,7 +144,6 @@ document.getElementById("selectedMatchInfo").textContent=
 selected.homeTeam+" vs "+selected.awayTeam;
 
 const eventTeam=document.getElementById("eventTeam");
-
 eventTeam.innerHTML="";
 
 [selected.homeTeam,selected.awayTeam].forEach(team=>{
@@ -155,6 +153,7 @@ option.textContent=team;
 eventTeam.appendChild(option);
 });
 }
+
 function loadMatches(){
 const league=document.getElementById("league").value;
 const teams=leagues[league];
@@ -174,7 +173,6 @@ awayTeam:match.away
 });
 
 option.textContent="Matchday "+match.round+" | "+match.home+" vs "+match.away;
-
 select.appendChild(option);
 });
 
@@ -198,23 +196,18 @@ const status=document.getElementById("status").value;
 
 const matchId=makeMatchId(homeTeam,awayTeam);
 
-const homeScore=Number(document.getElementById("homeScore").value);
-const awayScore=Number(document.getElementById("awayScore").value);
-const status=document.getElementById("status").value;
-
 await setDoc(doc(db,"matches",matchId),{
 league,
 round,
 homeTeam,
 awayTeam,
-events:arrayUnion({
-minute:minute+"'",
-team,
-type
-})
+homeScore,
+awayScore,
+status
 },{merge:true});
 
-document.getElementById("success").textContent="Saved: "+homeTeam+" "+homeScore+" - "+awayScore+" "+awayTeam;
+document.getElementById("success").textContent=
+"Saved: "+homeTeam+" "+homeScore+" - "+awayScore+" "+awayTeam;
 };
 
 document.getElementById("eventBtn").onclick=async()=>{
@@ -248,7 +241,9 @@ type
 })
 },{merge:true});
 
-document.getElementById("eventSuccess").textContent="Event added: "+minute+"' "+team+" "+type;
+document.getElementById("eventSuccess").textContent=
+"Event added: "+minute+"' "+team+" "+type;
+
 document.getElementById("eventMinute").value="";
 };
 
