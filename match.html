@@ -205,6 +205,16 @@ const isHome=event.team===home;
 let icon="⚽";
 let className="goal";
 
+if(event.type==="penalty_goal"){
+icon="🥅";
+className="goal";
+}
+
+if(event.type==="penalty_miss"){
+icon="🥅";
+className="red";
+}
+
 if(event.type==="yellow"){
 icon="🟨";
 className="yellow";
