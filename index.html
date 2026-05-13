@@ -24,9 +24,12 @@ td.team{text-align:left;font-weight:bold;white-space:nowrap}
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;color:#475569;font-size:14px}
 .dot{display:inline-block;width:13px;height:13px;border-radius:999px;margin-right:6px}.green{background:#16a34a}.green2{background:#22c55e}.red{background:#dc2626}
 .round{margin:20px 0 10px;padding:10px 12px;background:#0f172a;color:white;border-radius:10px;font-weight:bold}
-.match{display:grid;grid-template-columns:1fr 70px 1fr;gap:10px;align-items:center;padding:12px;border-radius:12px;background:#f8fafc;margin-bottom:9px;cursor:pointer}
-.home{text-align:right;font-weight:bold}.away{text-align:left;font-weight:bold}
-.score{text-align:center;font-weight:bold;background:white;border:1px solid #e5e7eb;border-radius:10px;padding:8px 4px}
+.match{display:grid;grid-template-columns:1fr 80px 1fr;gap:12px;align-items:center;padding:12px;border-radius:12px;background:#f8fafc;margin-bottom:9px;cursor:pointer}
+.home,.away{display:flex;align-items:center;gap:8px;font-weight:bold}
+.home{justify-content:flex-start;text-align:left}
+.away{justify-content:flex-end;text-align:right}
+.match .club-logo{width:30px;height:30px;margin:0}
+.score{text-align:center;font-weight:bold;background:white;border:1px solid #e5e7eb;border-radius:10px;padding:8px 4px;color:#0f172a}
 .not-played{color:#94a3b8}
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .info-box{background:#f8fafc;border-radius:14px;padding:14px;text-align:center}
@@ -252,9 +255,9 @@ const homeLogo=clubLogos[match.home]?`<img src="${clubLogos[match.home]}" class=
 const awayLogo=clubLogos[match.away]?`<img src="${clubLogos[match.away]}" class="club-logo">`:"";
 
 row.innerHTML=`
-<div class="home">${homeLogo}${match.home}</div>
+<div class="home">${homeLogo}<span>${match.home}</span></div>
 <div class="score ${hasScore?"":"not-played"}">${hasScore?score.home+" : "+score.away:"-"}</div>
-<div class="away">${awayLogo}${match.away}</div>
+<div class="away"><span>${match.away}</span>${awayLogo}</div>
 `;
 
 box.appendChild(row);
