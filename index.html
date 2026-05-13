@@ -248,10 +248,13 @@ const id=encodeURIComponent(currentLeague+"|"+match.round+"|"+match.home+"|"+mat
 window.location.href="match.html?id="+id;
 };
 
+const homeLogo=clubLogos[match.home]?`<img src="${clubLogos[match.home]}" class="club-logo">`:"";
+const awayLogo=clubLogos[match.away]?`<img src="${clubLogos[match.away]}" class="club-logo">`:"";
+
 row.innerHTML=`
-<div class="home">${match.home}</div>
+<div class="home">${homeLogo}${match.home}</div>
 <div class="score ${hasScore?"":"not-played"}">${hasScore?score.home+" : "+score.away:"-"}</div>
-<div class="away">${match.away}</div>
+<div class="away">${awayLogo}${match.away}</div>
 `;
 
 box.appendChild(row);
