@@ -255,9 +255,19 @@ const homeLogo=clubLogos[match.home]?`<img src="${clubLogos[match.home]}" class=
 const awayLogo=clubLogos[match.away]?`<img src="${clubLogos[match.away]}" class="club-logo">`:"";
 
 row.innerHTML=`
-<div class="home">${homeLogo}<span>${match.home}</span></div>
+<div class="home">
+<a href="team.html?team=${encodeURIComponent(match.home)}" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px;">
+${homeLogo}
+<span>${match.home}</span>
+</a>
+</div>
 <div class="score ${hasScore?"":"not-played"}">${hasScore?score.home+" : "+score.away:"-"}</div>
-<div class="away"><span>${match.away}</span>${awayLogo}</div>
+<div class="away">
+<a href="team.html?team=${encodeURIComponent(match.away)}" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px;">
+<span>${match.away}</span>
+${awayLogo}
+</a>
+</div>
 `;
 
 box.appendChild(row);
@@ -350,7 +360,12 @@ const row=document.createElement("tr");
 
 row.innerHTML=`
 <td><span class="${posClass}">${pos}</span></td>
-<td class="team">${logo}${team.name}</td>
+<td class="team">
+<a href="team.html?team=${encodeURIComponent(team.name)}" style="color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px;">
+${logo}
+<span>${team.name}</span>
+</a>
+</td>
 <td>${team.played}</td>
 <td>${team.wins}</td>
 <td>${team.draws}</td>
