@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProLiga Team Profile</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f3f4f6;color:#111827}
+header{background:linear-gradient(135deg,#0f172a,#111827);color:white;padding:28px 16px;text-align:center}
+main{max-width:900px;margin:22px auto;padding:0 12px 40px}
+.card{background:white;border-radius:18px;padding:18px;margin-bottom:22px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.team-head{text-align:center}
+.team-logo{width:110px;height:110px;object-fit:contain}
+h1{margin:10px 0 4px}
+.sub{color:#64748b}
+.match{display:grid;grid-template-columns:1fr 70px 1fr;gap:10px;align-items:center;padding:12px;border-radius:12px;background:#f8fafc;margin-bottom:9px}
+.home{text-align:right;font-weight:bold}
+.away{text-align:left;font-weight:bold}
+.score{text-align:center;font-weight:bold;background:white;border:1px solid #e5e7eb;border-radius:10px;padding:8px 4px}
+.not-played{color:#94a3b8}
+.back{display:block;text-align:center;color:#2563eb;text-decoration:none;margin-top:14px}
+</style>
+</head>
+<body>
+
+<header>
+<h2>PROLIGA TEAM PROFILE</h2>
+</header>
+
+<main>
+<section class="card team-head">
+<img id="teamLogo" class="team-logo">
+<h1 id="teamName"></h1>
+<p class="sub" id="teamLeague"></p>
+</section>
+
+<section class="card">
+<h2>Matches</h2>
+<div id="teamMatches"></div>
+</section>
+
+<a class="back" href="index.html">← Back to ProLiga</a>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
+authDomain:"proliga-1c9c3.firebaseapp.com",
+projectId:"proliga-1c9c3",
+storageBucket:"proliga-1c9c3.firebasestorage.app",
+messagingSenderId:"855885881253",
+appId:"1:855885881253:web:513f4eda5e65bf2ef9524c",
+measurementId:"G-87WHR4QBSL"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const leagues={
+"ProLiga 1":["Victoria FC","Olimpia FC","Royal Falcons","Olympique Nova","Real Vanguardia","Virello","Union Crest","Inter Blaze","Sporting Vale","City Rangers"],
+"ProLiga 2":["Portfield United","Atletico Bellmont","Deportivo Vale","Riverham FC","Westport United","Athletic Crown","Albion Kingsport","FC Southmoor","Highmoor Rovers","Stalovia"]
+};
+
+const clubLogos={
+"Victoria FC":"Projekt bez nazwy_20260508_214403_0000.png",
+"Olimpia FC":"Projekt bez nazwy_20260508_214448_0000.png",
+"City Rangers":"Projekt bez nazwy_20260508_215405_0000.png",
+"Royal Falcons":"Projekt bez nazwy_20260508_214638_0000.png",
+"Sporting Vale":"Projekt bez nazwy_20260508_215323_0000.png",
+"Virello":"Projekt bez nazwy_20260508_214902_0000.png",
+"Union Crest":"Projekt bez nazwy_20260508_215049_0000.png",
+"Real Vanguardia":"Projekt bez nazwy_20260508_214803_0000.png",
+"Olympique Nova":"Projekt bez nazwy_20260508_214723_0000.png",
+"Inter Blaze":"Projekt bez nazwy_20260508_215133_0000.png",
+"Portfield United":"Projekt bez nazwy_20260508_215742_0000.png",
+"Atletico Bellmont":"Projekt bez nazwy_20260508_215824_0000.png",
+"Deportivo Vale":"Projekt bez nazwy_20260508_220602_0000.png",
+"Riverham FC":"Projekt bez nazwy_20260508_220656_0000.png",
+"Westport United":"Projekt bez nazwy_20260508_220739_0000.png",
+"Athletic Crown":"Projekt bez nazwy_20260508_220817_0000.png",
+"Albion Kingsport":"Projekt bez nazwy_20260508_220954_0000.png",
+"FC Southmoor":"Projekt bez nazwy_20260508_221106_0000.png",
+"Highmoor Rovers":"Projekt bez nazwy_20260508_221147_0000.png",
+"Stalovia":"Projekt bez nazwy_20260508_221225_0000.png"
+};
+
+const localScores={
+"ProLiga 1":{
+"1|Victoria FC|City Rangers":{home:2,away:1},
+"1|Olimpia FC|Sporting Vale":{home:4,away:4},
+"1|Royal Falcons|Inter Blaze":{home:2,away:2},
+"1|Olympique Nova|Union Crest":{home:3,away:4},
+"1|Real Vanguardia|Virello":{home:1,away:6}
+},
+"ProLiga 2":{
+"1|Portfield United|Stalovia":{home:5,away:3},
+"1|Atletico Bellmont|Highmoor Rovers":{home:3,away:3},
+"1|Deportivo Vale|FC Southmoor":{home:2,away:4},
+"1|Riverham FC|Albion Kingsport":{home:4,away:2},
+"1|Westport United|Athletic Crown":{home:1,away:2}
+}
+};
+
+let scores={};
+
+function createSchedule(teams){
+const firstHalf=[],arr=[...teams],rounds=arr.length-1,half=arr.length/2;
+for(let round=0;round<rounds;round++){
+for(let i=0;i<half;i++){
+let home=arr[i],away=arr[arr.length-1-i];
+if(round%2===1){let temp=home;home=away;away=temp}
+firstHalf.push({home,away,round:round+1});
+}
+arr.splice(1,0,arr.pop());
+}
+const secondHalf=firstHalf.map(m=>({home:m.away,away:m.home,round:m.round+rounds}));
+return[...firstHalf,...secondHalf];
+}
+
+function cleanText(value){return String(value || "").trim();}
+function scoreKey(match){return String(match.round)+"|"+match.home+"|"+match.away;}
+
+function findLeague(team){
+return Object.keys(leagues).find(league=>leagues[league].includes(team));
+}
+
+function getScore(league,match){
+return scores[league]?.[scoreKey(match)] || localScores[league]?.[scoreKey(match)] || {home:null,away:null};
+}
+
+async function loadScoresFromFirebase(){
+scores={};
+const snapshot=await getDocs(collection(db,"matches"));
+snapshot.forEach(item=>{
+const data=item.data();
+const league=cleanText(data.league);
+const round=cleanText(data.round);
+const homeTeam=cleanText(data.homeTeam);
+const awayTeam=cleanText(data.awayTeam);
+if(!league || !round || !homeTeam || !awayTeam)return;
+if(data.homeScore === undefined || data.awayScore === undefined)return;
+if(!scores[league])scores[league]={};
+scores[league][round+"|"+homeTeam+"|"+awayTeam]={
+home:data.homeScore,
+away:data.awayScore
+};
+});
+}
+
+function renderTeam(){
+const params=new URLSearchParams(window.location.search);
+const team=params.get("team");
+
+if(!team){
+document.getElementById("teamName").textContent="Team not found";
+return;
+}
+
+const league=findLeague(team);
+const allMatches=createSchedule(leagues[league]).filter(m=>m.home===team || m.away===team);
+
+document.getElementById("teamName").textContent=team;
+document.getElementById("teamLeague").textContent=league;
+document.getElementById("teamLogo").src=clubLogos[team] || "";
+
+const box=document.getElementById("teamMatches");
+box.innerHTML="";
+
+allMatches.forEach(match=>{
+const score=getScore(league,match);
+const hasScore=score.home!==null&&score.away!==null&&score.home!==undefined&&score.away!==undefined;
+
+const row=document.createElement("div");
+row.className="match";
+row.onclick=()=>{
+const id=encodeURIComponent(league+"|"+match.round+"|"+match.home+"|"+match.away);
+window.location.href="match.html?id="+id;
+};
+
+row.innerHTML=`
+<div class="home">${match.home}</div>
+<div class="score ${hasScore?"":"not-played"}">${hasScore?score.home+" : "+score.away:"-"}</div>
+<div class="away">${match.away}</div>
+`;
+
+box.appendChild(row);
+});
+}
+
+renderTeam();
+
+loadScoresFromFirebase()
+.then(()=>renderTeam())
+.catch(error=>console.log("Firebase error:",error));
+</script>
+
+</body>
+  </html>
