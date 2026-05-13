@@ -188,6 +188,8 @@ if(!scores[league])scores[league]={};
 
 const key=round+"|"+homeTeam+"|"+awayTeam;
 
+if(data.homeScore === undefined || data.awayScore === undefined)return;
+  
 scores[league][key]={
 home:data.homeScore,
 away:data.awayScore,
