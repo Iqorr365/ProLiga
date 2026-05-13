@@ -57,7 +57,9 @@ h2{margin:0 0 14px;font-size:20px}
 <div class="scoreboard">
 <div class="team">
 <img id="homeLogo">
+<a id="homeTeamLink" style="color:white;text-decoration:none;">
 <div class="team-name" id="homeTeam"></div>
+</a>
 </div>
 
 <div>
@@ -69,7 +71,9 @@ h2{margin:0 0 14px;font-size:20px}
 
 <div class="team">
 <img id="awayLogo">
+<a id="awayTeamLink" style="color:white;text-decoration:none;">
 <div class="team-name" id="awayTeam"></div>
+</a>
 </div>
 </div>
 </section>
@@ -160,6 +164,8 @@ const away=parts[3];
 document.getElementById("matchInfo").textContent=league+" • Matchday "+round;
 document.getElementById("homeTeam").textContent=home;
 document.getElementById("awayTeam").textContent=away;
+document.getElementById("homeTeamLink").href="team.html?team="+encodeURIComponent(home);
+document.getElementById("awayTeamLink").href="team.html?team="+encodeURIComponent(away);
 document.getElementById("homeLogo").src=clubLogos[home] || "";
 document.getElementById("awayLogo").src=clubLogos[away] || "";
 
