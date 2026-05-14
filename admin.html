@@ -10,9 +10,11 @@ body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:white;paddin
 .card{background:#111827;border:1px solid #334155;border-radius:20px;padding:20px;margin-bottom:20px}
 h1,h2{margin-top:0}
 label{display:block;margin-bottom:8px;font-size:14px;color:#cbd5e1}
-input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:white;margin-bottom:16px;font-size:15px;box-sizing:border-box}
+input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:white;margin-bottom:16px;font-size:15px;box-sizing:border-box}
+textarea{min-height:110px;resize:vertical}
 button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a;color:white;font-size:16px;font-weight:bold;cursor:pointer;margin-top:6px}
 .event-btn{background:#2563eb}
+.news-btn{background:#f97316}
 .success{margin-top:14px;color:#4ade80;text-align:center;font-weight:bold}
 </style>
 </head>
@@ -73,11 +75,31 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 <div class="success" id="eventSuccess"></div>
 </div>
 
+<div class="card">
+<h2>Add News</h2>
+
+<label>News Category</label>
+<select id="newsCategory">
+<option value="General">General</option>
+<option value="ProLiga 1">ProLiga 1</option>
+<option value="ProLiga 2">ProLiga 2</option>
+</select>
+
+<label>News Title</label>
+<input type="text" id="newsTitle" placeholder="🔥 Big matchday drama">
+
+<label>News Text</label>
+<textarea id="newsText" placeholder="Write anything here. Emojis also work 😄🔥⚽"></textarea>
+
+<button class="news-btn" id="newsBtn">Publish News</button>
+<div class="success" id="newsSuccess"></div>
+</div>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, arrayUnion, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
@@ -245,6 +267,28 @@ document.getElementById("eventSuccess").textContent=
 "Event added: "+minute+"' "+team+" "+type;
 
 document.getElementById("eventMinute").value="";
+};
+
+document.getElementById("newsBtn").onclick=async()=>{
+const category=document.getElementById("newsCategory").value;
+const title=document.getElementById("newsTitle").value.trim();
+const text=document.getElementById("newsText").value.trim();
+
+if(!title || !text){
+document.getElementById("newsSuccess").textContent="Enter title and text first.";
+return;
+}
+
+await addDoc(collection(db,"news"),{
+category,
+title,
+text,
+createdAt:serverTimestamp()
+});
+
+document.getElementById("newsSuccess").textContent="News published successfully!";
+document.getElementById("newsTitle").value="";
+document.getElementById("newsText").value="";
 };
 
 loadMatches();
