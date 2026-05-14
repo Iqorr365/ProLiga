@@ -31,6 +31,18 @@ td.team{text-align:left;font-weight:bold;white-space:nowrap}
 .match .club-logo{width:30px;height:30px;margin:0}
 .score{text-align:center;font-weight:bold;background:white;border:1px solid #e5e7eb;border-radius:10px;padding:8px 4px;color:#0f172a}
 .not-played{color:#94a3b8}
+.live-badge{
+font-size:11px;
+font-weight:bold;
+color:#dc2626;
+margin-bottom:4px;
+text-transform:uppercase;
+}
+
+.live-team{
+color:#dc2626;
+font-weight:bold;
+}
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .info-box{background:#f8fafc;border-radius:14px;padding:14px;text-align:center}
 .info-box b{display:block;font-size:20px}.info-box span{color:#64748b;font-size:13px}
@@ -60,7 +72,6 @@ td.team{text-align:left;font-weight:bold;white-space:nowrap}
 </div>
 </section>
 
-<section class="card">
 <section class="card">
 <h2>League News</h2>
 <div id="latestNews"></div>
@@ -201,6 +212,40 @@ function getScore(match){
 return scores[currentLeague]?.[scoreKey(match)] || localScores[currentLeague]?.[scoreKey(match)] || {home:null,away:null};
 }
 
+function getLiveMinute(score){
+if(!score.status)return "";
+
+if(score.status==="HT")return "HT";
+if(score.status==="FT")return "FT";
+
+if(score.status!=="LIVE 1H" && score.status!=="LIVE 2H") return "";
+
+const started=score.liveStartedAt || Date.now();
+const now=Date.now();
+
+const diff=Math.floor((now-started)/60000);
+
+let minute=(score.liveMinute || 1)+diff;
+
+if(score.status==="LIVE 1H"){
+if(minute>50)minute=50;
+
+if(minute>45){
+return "LIVE 45+"+(minute-45)+"'";
+}
+}
+
+if(score.status==="LIVE 2H"){
+if(minute>100)minute=100;
+
+if(minute>90){
+return "LIVE 90+"+(minute-90)+"'";
+}
+}
+
+return "LIVE "+minute+"'";
+  }
+  
 async function loadScoresFromFirebase(){
 scores={};
 
@@ -225,7 +270,9 @@ if(data.homeScore === undefined || data.awayScore === undefined)return;
 scores[league][key]={
 home:data.homeScore,
 away:data.awayScore,
-status:data.status || "FT"
+status:data.status || "FT",
+liveMinute:data.liveMinute || 1,
+liveStartedAt:data.liveStartedAt || Date.now()
 };
 });
 }
@@ -261,7 +308,8 @@ box.appendChild(title);
 
 const score=getScore(match);
 const hasScore=score.home!==null&&score.away!==null&&score.home!==undefined&&score.away!==undefined;
-
+const liveText=getLiveMinute(score);
+  
 const row=document.createElement("div");
 row.className="match";
 
@@ -278,7 +326,10 @@ row.innerHTML=`
 ${homeLogo}
 <span>${match.home}</span>
 </div>
-<div class="score ${hasScore?"":"not-played"}">${hasScore?score.home+" : "+score.away:"-"}</div>
+<div class="score ${hasScore?"":"not-played"}">
+${liveText ? `<div class="live-badge">${liveText}</div>` : ""}
+${hasScore?score.home+" : "+score.away:"-"}
+</div>
 <div class="away">
 <span>${match.away}</span>
 ${awayLogo}
