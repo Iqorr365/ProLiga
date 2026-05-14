@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProLiga News</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f3f4f6;color:#111827}
+header{background:linear-gradient(135deg,#0f172a,#111827);color:white;padding:28px 16px;text-align:center}
+main{max-width:900px;margin:22px auto;padding:0 12px 40px}
+.card{background:white;border-radius:18px;padding:18px;margin-bottom:18px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.news-general{border:2px solid #64748b}
+.news-p1{border:3px dashed #f97316;background:#fff7ed}
+.news-p2{border:3px dashed #2563eb;background:#eff6ff}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:bold;margin-bottom:10px}
+.badge-general{background:#e2e8f0;color:#334155}
+.badge-p1{background:#fed7aa;color:#9a3412}
+.badge-p2{background:#bfdbfe;color:#1e40af}
+.news-title{font-size:22px;font-weight:bold;margin-bottom:8px}
+.news-text{color:#475569;white-space:pre-wrap;line-height:1.5}
+.date{font-size:12px;color:#64748b;margin-top:12px}
+.back{display:block;text-align:center;color:#2563eb;text-decoration:none;margin-top:18px}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>PROLIGA NEWS</h1>
+<p>Official league updates and announcements</p>
+</header>
+
+<main>
+<div id="newsBox"></div>
+<a class="back" href="index.html">← Back to ProLiga</a>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+apiKey:"AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
+authDomain:"proliga-1c9c3.firebaseapp.com",
+projectId:"proliga-1c9c3",
+storageBucket:"proliga-1c9c3.firebasestorage.app",
+messagingSenderId:"855885881253",
+appId:"1:855885881253:web:513f4eda5e65bf2ef9524c",
+measurementId:"G-87WHR4QBSL"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+function newsClass(category){
+if(category==="ProLiga 1")return "news-p1";
+if(category==="ProLiga 2")return "news-p2";
+return "news-general";
+}
+
+function badgeClass(category){
+if(category==="ProLiga 1")return "badge-p1";
+if(category==="ProLiga 2")return "badge-p2";
+return "badge-general";
+}
+
+function formatDate(timestamp){
+if(!timestamp || !timestamp.toDate)return "";
+return timestamp.toDate().toLocaleDateString("pl-PL");
+}
+
+async function loadNews(){
+const box=document.getElementById("newsBox");
+box.innerHTML="<div class='card'>Loading news...</div>";
+
+const snapshot=await getDocs(collection(db,"news"));
+const news=[];
+
+snapshot.forEach(doc=>{
+news.push(doc.data());
+});
+
+news.sort((a,b)=>{
+const aTime=a.createdAt?.seconds || 0;
+const bTime=b.createdAt?.seconds || 0;
+return bTime-aTime;
+});
+
+box.innerHTML="";
+
+if(news.length===0){
+box.innerHTML="<div class='card'>No news yet.</div>";
+return;
+}
+
+news.forEach(item=>{
+const category=item.category || "General";
+
+const card=document.createElement("div");
+card.className="card "+newsClass(category);
+
+card.innerHTML=`
+<div class="badge ${badgeClass(category)}">${category}</div>
+<div class="news-title">${item.title || ""}</div>
+<div class="news-text">${item.text || ""}</div>
+<div class="date">${formatDate(item.createdAt)}</div>
+`;
+
+box.appendChild(card);
+});
+}
+
+loadNews();
+</script>
+
+</body>
+</html>
