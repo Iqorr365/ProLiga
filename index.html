@@ -215,9 +215,8 @@ return scores[currentLeague]?.[scoreKey(match)] || localScores[currentLeague]?.[
 function getLiveMinute(score){
 if(!score.status)return "";
 
-if(score.status==="HT")return "HT";
-if(score.status==="FT")return "FT";
-
+if(score.status==="HT")return "<span style='color:#f59e0b'>HT</span>";
+if(score.status==="FT")return "<span style='color:#111827'>FT</span>";
 if(score.status!=="LIVE 1H" && score.status!=="LIVE 2H") return "";
 
 const started=score.liveStartedAt || Date.now();
