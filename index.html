@@ -61,31 +61,9 @@ td.team{text-align:left;font-weight:bold;white-space:nowrap}
 </section>
 
 <section class="card">
+<section class="card">
 <h2>League News</h2>
-
-<div style="display:flex;flex-direction:column;gap:14px;">
-
-<div style="padding:14px;border-radius:14px;background:#f8fafc;">
-<div style="font-size:12px;color:#64748b;margin-bottom:6px;">8 May 2026</div>
-<div style="font-weight:bold;font-size:18px;margin-bottom:6px;">
-Virello dominates opening matchday
-</div>
-<div style="color:#475569;">
-Virello started the season in style with a dominant 6-1 victory over Real Vanguardia.
-</div>
-</div>
-
-<div style="padding:14px;border-radius:14px;background:#f8fafc;">
-<div style="font-size:12px;color:#64748b;margin-bottom:6px;">8 May 2026</div>
-<div style="font-weight:bold;font-size:18px;margin-bottom:6px;">
-Portfield United claims first win
-</div>
-<div style="color:#475569;">
-Portfield United secured an entertaining 5-3 win against Stalovia in ProLiga 2.
-</div>
-</div>
-
-</div>
+<div id="latestNews"></div>
 </section>
   
 <div class="tabs">
@@ -433,6 +411,62 @@ renderMatches();
 renderTable();
 renderLegend();
 
+async function loadLatestNews(){
+const box=document.getElementById("latestNews");
+
+const snapshot=await getDocs(collection(db,"news"));
+
+const news=[];
+
+snapshot.forEach(doc=>{
+news.push(doc.data());
+});
+
+news.sort((a,b)=>{
+const aTime=a.createdAt?.seconds || 0;
+const bTime=b.createdAt?.seconds || 0;
+return bTime-aTime;
+});
+
+if(news.length===0){
+box.innerHTML="<p>No news yet.</p>";
+return;
+}
+
+const item=news[0];
+
+let bg="#f8fafc";
+let border="#64748b";
+
+if(item.category==="ProLiga 1"){
+bg="#fff7ed";
+border="#f97316";
+}
+
+if(item.category==="ProLiga 2"){
+bg="#eff6ff";
+border="#2563eb";
+}
+
+box.innerHTML=`
+<a href="news.html" style="text-decoration:none;color:inherit;">
+<div style="padding:16px;border-radius:16px;border:3px dashed ${border};background:${bg};">
+<div style="font-size:12px;margin-bottom:8px;color:#64748b;">
+${item.category || "General"}
+</div>
+
+<div style="font-size:22px;font-weight:bold;margin-bottom:8px;">
+${item.title || ""}
+</div>
+
+<div style="color:#475569;">
+${item.text || ""}
+</div>
+</div>
+</a>
+`;
+}
+  
 loadScoresFromFirebase()
 .then(()=>{
 renderMatches();
@@ -442,6 +476,7 @@ renderLegend();
 .catch(error=>{
 console.log("Firebase error:",error);
 });
+loadLatestNews();
 </script>
 
 </body>
