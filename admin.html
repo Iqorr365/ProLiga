@@ -43,10 +43,14 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 <label>Status</label>
 <select id="status">
 <option>NS</option>
-<option>LIVE</option>
+<option>LIVE 1H</option>
 <option>HT</option>
+<option>LIVE 2H</option>
 <option selected>FT</option>
 </select>
+
+<label>Live Minute</label>
+<input type="number" id="liveMinute" value="1">
 
 <button id="saveBtn">Save Match</button>
 <div class="success" id="success"></div>
@@ -215,6 +219,8 @@ const awayTeam=selected.awayTeam;
 const homeScore=Number(document.getElementById("homeScore").value);
 const awayScore=Number(document.getElementById("awayScore").value);
 const status=document.getElementById("status").value;
+const liveMinute=Number(document.getElementById("liveMinute").value);
+const liveStartedAt=Date.now();
 
 const matchId=makeMatchId(homeTeam,awayTeam);
 
@@ -225,7 +231,9 @@ homeTeam,
 awayTeam,
 homeScore,
 awayScore,
-status
+status,
+liveMinute,
+liveStartedAt,
 },{merge:true});
 
 document.getElementById("success").textContent=
