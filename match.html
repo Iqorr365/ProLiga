@@ -133,6 +133,31 @@ return home.toLowerCase().trim().replaceAll(" ","-")
 away.toLowerCase().trim().replaceAll(" ","-");
 }
 
+function getLiveMinute(data){
+if(!data.status)return "NS";
+
+if(data.status==="HT")return "HT";
+if(data.status==="FT")return "FT";
+
+if(data.status!=="LIVE 1H" && data.status!=="LIVE 2H")return data.status;
+
+const started=data.liveStartedAt || Date.now();
+const diff=Math.floor((Date.now()-started)/60000);
+let minute=(data.liveMinute || 1)+diff;
+
+if(data.status==="LIVE 1H"){
+if(minute>50)minute=50;
+if(minute>45)return "LIVE 45+"+(minute-45)+"'";
+}
+
+if(data.status==="LIVE 2H"){
+if(minute>100)minute=100;
+if(minute>90)return "LIVE 90+"+(minute-90)+"'";
+}
+
+return "LIVE "+minute+"'";
+}
+  
 const localScores={
 "ProLiga 1":{
 "1|Victoria FC|City Rangers": {home: 2, away: 1},
@@ -171,6 +196,7 @@ document.getElementById("awayLogo").src=clubLogos[away] || "";
 
 let score=null;
 let status="NS";
+let liveData={status:"NS"};
 let events=[];
 
 const firebaseId=makeMatchId(home,away);
@@ -186,7 +212,8 @@ if(data.homeScore !== undefined && data.awayScore !== undefined){
 score={home:data.homeScore,away:data.awayScore};
 }
 
-status=data.status || "FT";
+liveData=data;
+status=getLiveMinute(data);
 events=data.events || [];
 }
 }catch(error){
