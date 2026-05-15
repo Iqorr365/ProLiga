@@ -51,6 +51,33 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 
 <label>Live Minute</label>
 <input type="number" id="liveMinute" value="1">
+  
+<button id="saveBtn">Save Match</button>
+<div class="success" id="success"></div>
+</div>
+
+<div class="card">
+<h2>Add Match Event</h2>
+<h3 id="selectedMatchInfo" style="color:#93c5fd;margin-top:-6px;margin-bottom:16px;"></h3>
+
+<label>Minute</label>
+<input type="number" id="eventMinute" placeholder="14">
+
+<label>Team</label>
+<select id="eventTeam"></select>
+
+<label>Event Type</label>
+<select id="eventType">
+<option value="goal">Goal</option>
+<option value="penalty_goal">Penalty Goal</option>
+<option value="penalty_miss">Missed Penalty</option>
+<option value="yellow">Yellow Card</option>
+<option value="red">Red Card</option>
+</select>
+
+<button class="event-btn" id="eventBtn">Add Event</button>
+<div class="success" id="eventSuccess"></div>
+</div>
 
 <h2>Match Stats</h2>
 
@@ -83,34 +110,9 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 
 <label>Away Fouls</label>
 <input type="number" id="awayFouls" value="0">
+<button class="event-btn" id="statsBtn">Save Match Stats</button>
+<div class="success" id="statsSuccess"></div>
   
-<button id="saveBtn">Save Match</button>
-<div class="success" id="success"></div>
-</div>
-
-<div class="card">
-<h2>Add Match Event</h2>
-<h3 id="selectedMatchInfo" style="color:#93c5fd;margin-top:-6px;margin-bottom:16px;"></h3>
-
-<label>Minute</label>
-<input type="number" id="eventMinute" placeholder="14">
-
-<label>Team</label>
-<select id="eventTeam"></select>
-
-<label>Event Type</label>
-<select id="eventType">
-<option value="goal">Goal</option>
-<option value="penalty_goal">Penalty Goal</option>
-<option value="penalty_miss">Missed Penalty</option>
-<option value="yellow">Yellow Card</option>
-<option value="red">Red Card</option>
-</select>
-
-<button class="event-btn" id="eventBtn">Add Event</button>
-<div class="success" id="eventSuccess"></div>
-</div>
-
 <div class="card">
 <h2>Add News</h2>
 
@@ -253,18 +255,6 @@ const awayScore=Number(document.getElementById("awayScore").value);
 const status=document.getElementById("status").value;
 const liveMinute=Number(document.getElementById("liveMinute").value);
 const liveStartedAt=Date.now();
-const stats={
-homePossession:Number(document.getElementById("homePossession").value),
-awayPossession:Number(document.getElementById("awayPossession").value),
-homeShots:Number(document.getElementById("homeShots").value),
-awayShots:Number(document.getElementById("awayShots").value),
-homeShotsOnTarget:Number(document.getElementById("homeShotsOnTarget").value),
-awayShotsOnTarget:Number(document.getElementById("awayShotsOnTarget").value),
-homeCorners:Number(document.getElementById("homeCorners").value),
-awayCorners:Number(document.getElementById("awayCorners").value),
-homeFouls:Number(document.getElementById("homeFouls").value),
-awayFouls:Number(document.getElementById("awayFouls").value)
-};
 
 const matchId=makeMatchId(homeTeam,awayTeam);
 
@@ -278,7 +268,6 @@ awayScore,
 status,
 liveMinute,
 liveStartedAt,
-stats,
 },{merge:true});
 
 document.getElementById("success").textContent=
@@ -322,6 +311,47 @@ document.getElementById("eventSuccess").textContent=
 document.getElementById("eventMinute").value="";
 };
 
+document.getElementById("statsBtn").onclick=async()=>{
+
+const selected=getSelectedMatch();
+
+const league=selected.league;
+const round=Number(selected.round);
+const homeTeam=selected.homeTeam;
+const awayTeam=selected.awayTeam;
+
+const stats={
+homePossession:Number(document.getElementById("homePossession").value),
+awayPossession:Number(document.getElementById("awayPossession").value),
+
+homeShots:Number(document.getElementById("homeShots").value),
+awayShots:Number(document.getElementById("awayShots").value),
+
+homeShotsOnTarget:Number(document.getElementById("homeShotsOnTarget").value),
+awayShotsOnTarget:Number(document.getElementById("awayShotsOnTarget").value),
+
+homeCorners:Number(document.getElementById("homeCorners").value),
+awayCorners:Number(document.getElementById("awayCorners").value),
+
+homeFouls:Number(document.getElementById("homeFouls").value),
+awayFouls:Number(document.getElementById("awayFouls").value)
+};
+
+const matchId=makeMatchId(homeTeam,awayTeam);
+
+await setDoc(doc(db,"matches",matchId),{
+league,
+round,
+homeTeam,
+awayTeam,
+stats
+},{merge:true});
+
+document.getElementById("statsSuccess").textContent=
+"Match stats saved successfully!";
+
+};
+  
 document.getElementById("newsBtn").onclick=async()=>{
 const category=document.getElementById("newsCategory").value;
 const title=document.getElementById("newsTitle").value.trim();
