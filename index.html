@@ -536,6 +536,14 @@ renderLegend();
 console.log("Firebase error:",error);
 });
 loadLatestNews();
+setInterval(()=>{
+loadScoresFromFirebase()
+.then(()=>{
+renderMatches();
+renderTable();
+renderLegend();
+});
+},15000);
 </script>
 
 </body>
