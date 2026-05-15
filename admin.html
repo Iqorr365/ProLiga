@@ -52,6 +52,38 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 <label>Live Minute</label>
 <input type="number" id="liveMinute" value="1">
 
+<h2>Match Stats</h2>
+
+<label>Home Possession %</label>
+<input type="number" id="homePossession" value="50">
+
+<label>Away Possession %</label>
+<input type="number" id="awayPossession" value="50">
+
+<label>Home Shots</label>
+<input type="number" id="homeShots" value="0">
+
+<label>Away Shots</label>
+<input type="number" id="awayShots" value="0">
+
+<label>Home Shots On Target</label>
+<input type="number" id="homeShotsOnTarget" value="0">
+
+<label>Away Shots On Target</label>
+<input type="number" id="awayShotsOnTarget" value="0">
+
+<label>Home Corners</label>
+<input type="number" id="homeCorners" value="0">
+
+<label>Away Corners</label>
+<input type="number" id="awayCorners" value="0">
+
+<label>Home Fouls</label>
+<input type="number" id="homeFouls" value="0">
+
+<label>Away Fouls</label>
+<input type="number" id="awayFouls" value="0">
+  
 <button id="saveBtn">Save Match</button>
 <div class="success" id="success"></div>
 </div>
@@ -221,6 +253,18 @@ const awayScore=Number(document.getElementById("awayScore").value);
 const status=document.getElementById("status").value;
 const liveMinute=Number(document.getElementById("liveMinute").value);
 const liveStartedAt=Date.now();
+const stats={
+homePossession:Number(document.getElementById("homePossession").value),
+awayPossession:Number(document.getElementById("awayPossession").value),
+homeShots:Number(document.getElementById("homeShots").value),
+awayShots:Number(document.getElementById("awayShots").value),
+homeShotsOnTarget:Number(document.getElementById("homeShotsOnTarget").value),
+awayShotsOnTarget:Number(document.getElementById("awayShotsOnTarget").value),
+homeCorners:Number(document.getElementById("homeCorners").value),
+awayCorners:Number(document.getElementById("awayCorners").value),
+homeFouls:Number(document.getElementById("homeFouls").value),
+awayFouls:Number(document.getElementById("awayFouls").value)
+};
 
 const matchId=makeMatchId(homeTeam,awayTeam);
 
@@ -234,6 +278,7 @@ awayScore,
 status,
 liveMinute,
 liveStartedAt,
+stats,
 },{merge:true});
 
 document.getElementById("success").textContent=
