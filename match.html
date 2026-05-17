@@ -127,8 +127,7 @@ to{opacity:1;transform:translateY(0)}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig = {
 apiKey: "AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
 authDomain: "proliga-1c9c3.firebaseapp.com",
@@ -396,18 +395,6 @@ statsBox.innerHTML='<p style="text-align:center;color:#94a3b8;">No stats yet</p>
 }
 }
 
-setInterval(()=>{
-sessionStorage.setItem("matchScroll", window.scrollY);
-window.location.reload();
-},15000);
-
-window.addEventListener("load",()=>{
-const savedScroll=sessionStorage.getItem("matchScroll");
-if(savedScroll){
-window.scrollTo(0, Number(savedScroll));
-}
-});
-  
 </script>
 
 </body>
