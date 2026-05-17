@@ -56,7 +56,6 @@ to{opacity:1;transform:translateY(0)}
 }
 
 .event{animation:eventPop .35s ease}
-.goal-glow{box-shadow:0 0 14px rgba(22,163,74,.45)}
 @keyframes scoreFlash{
 0%{transform:scale(1);text-shadow:none}
 35%{transform:scale(1.12);text-shadow:0 0 24px rgba(34,197,94,.95)}
@@ -343,10 +342,6 @@ className="red";
 
 const row=document.createElement("div");
 row.className="event";
-
-if(event.type==="goal" || event.type==="penalty_goal"){
-row.classList.add("goal-glow");
-}
 
 if(isHome){
 row.innerHTML=`
