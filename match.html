@@ -49,6 +49,21 @@ h2{margin:0 0 14px;font-size:20px}
 .bar-bg{height:10px;background:#1e293b;border-radius:999px;overflow:hidden;display:flex;}
 .bar-fill{height:100%;background:#22c55e;border-radius:999px;margin-left:auto;}
 .bar-fill.away-fill{background:#6366f1;margin-left:0;}
+@keyframes pulseLive{
+0%{box-shadow:0 0 0 rgba(220,38,38,0)}
+50%{box-shadow:0 0 18px rgba(220,38,38,.75)}
+100%{box-shadow:0 0 0 rgba(220,38,38,0)}
+}
+
+@keyframes eventPop{
+from{opacity:0;transform:translateY(8px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+.live-status{animation:pulseLive 1.4s infinite}
+.live-score{text-shadow:0 0 18px rgba(220,38,38,.7)}
+.event{animation:eventPop .35s ease}
+.goal-glow{box-shadow:0 0 14px rgba(22,163,74,.45)}
 .back{display:block;text-align:center;color:#93c5fd;text-decoration:none;margin-top:14px}
 @media(max-width:650px){
 .scoreboard{grid-template-columns:1fr 90px 1fr}
@@ -251,6 +266,10 @@ if(score) status="FT";
 if(score){
 document.getElementById("score").textContent=score.home+" : "+score.away;
 document.getElementById("status").textContent=status;
+if(status.includes("LIVE")){
+document.getElementById("status").classList.add("live-status");
+document.getElementById("score").classList.add("live-score");
+}
 }else{
 document.getElementById("score").textContent="- : -";
 document.getElementById("status").textContent="NS";
@@ -293,6 +312,10 @@ className="red";
 
 const row=document.createElement("div");
 row.className="event";
+
+if(event.type==="goal" || event.type==="penalty_goal"){
+row.classList.add("goal-glow");
+}
 
 if(isHome){
 row.innerHTML=`
