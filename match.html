@@ -365,12 +365,12 @@ const statsBox=document.getElementById("matchStats");
 
 if(stats){
 statsBox.innerHTML=
-statRow("Posiadanie",stats.homePossession,stats.awayPossession,"%")+
-statRow("Oczekiwane gole xG",stats.homeXg,stats.awayXg,"",true)+
-statRow("Strzały",stats.homeShots,stats.awayShots)+
-statRow("Strzały celne",stats.homeShotsOnTarget,stats.awayShotsOnTarget)+
-statRow("Rzuty rożne",stats.homeCorners,stats.awayCorners)+
-statRow("Faule",stats.homeFouls,stats.awayFouls);
+statRow("Possession",stats.homePossession,stats.awayPossession,"%")+
+statRow("Expected Goals (xG)",stats.homeXg,stats.awayXg,"",true)+
+statRow("Shots",stats.homeShots,stats.awayShots)+
+statRow("Shots On Target",stats.homeShotsOnTarget,stats.awayShotsOnTarget)+
+statRow("Corners",stats.homeCorners,stats.awayCorners)+
+statRow("Fouls",stats.homeFouls,stats.awayFouls);
 }else{
 statsBox.innerHTML='<p style="text-align:center;color:#94a3b8;">Brak statystyk</p>';
 }
