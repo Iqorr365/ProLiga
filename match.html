@@ -128,6 +128,7 @@ to{opacity:1;transform:translateY(0)}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 const firebaseConfig = {
 apiKey: "AIzaSyBMOx7FqO0XPWj2HtRG2vRP3GUcr5AsHWY",
 authDomain: "proliga-1c9c3.firebaseapp.com",
@@ -164,18 +165,31 @@ const clubLogos={
 "Stalovia":"Projekt bez nazwy_20260508_221225_0000.png"
 };
 
+const localScores={
+"ProLiga 1":{
+"1|Victoria FC|City Rangers": {home: 2, away: 1},
+"1|Olimpia FC|Sporting Vale": {home: 4, away: 4},
+"1|Royal Falcons|Inter Blaze": {home: 2, away: 2},
+"1|Olympique Nova|Union Crest": {home: 3, away: 4},
+"1|Real Vanguardia|Virello": {home: 1, away: 6}
+},
+"ProLiga 2":{
+"1|Portfield United|Stalovia": {home: 5, away: 3},
+"1|Atletico Bellmont|Highmoor Rovers": {home: 3, away: 3},
+"1|Deportivo Vale|FC Southmoor": {home: 2, away: 4},
+"1|Riverham FC|Albion Kingsport": {home: 4, away: 2},
+"1|Westport United|Athletic Crown": {home: 1, away: 2}
+}
+};
+
 function makeMatchId(home,away){
-return home.toLowerCase().trim().replaceAll(" ","-")
-+"-"+
-away.toLowerCase().trim().replaceAll(" ","-");
+return home.toLowerCase().trim().replaceAll(" ","-")+"-"+away.toLowerCase().trim().replaceAll(" ","-");
 }
 
 function getLiveMinute(data){
 if(!data.status)return "NS";
-
 if(data.status==="HT")return "HT";
 if(data.status==="FT")return "FT";
-
 if(data.status!=="LIVE 1H" && data.status!=="LIVE 2H")return data.status;
 
 const started=data.liveStartedAt || Date.now();
@@ -194,23 +208,38 @@ if(minute>90)return "LIVE 90+"+(minute-90)+"'";
 
 return "LIVE "+minute+"'";
 }
-  
-const localScores={
-"ProLiga 1":{
-"1|Victoria FC|City Rangers": {home: 2, away: 1},
-"1|Olimpia FC|Sporting Vale": {home: 4, away: 4},
-"1|Royal Falcons|Inter Blaze": {home: 2, away: 2},
-"1|Olympique Nova|Union Crest": {home: 3, away: 4},
-"1|Real Vanguardia|Virello": {home: 1, away: 6}
-},
-"ProLiga 2":{
-"1|Portfield United|Stalovia": {home: 5, away: 3},
-"1|Atletico Bellmont|Highmoor Rovers": {home: 3, away: 3},
-"1|Deportivo Vale|FC Southmoor": {home: 2, away: 4},
-"1|Riverham FC|Albion Kingsport": {home: 4, away: 2},
-"1|Westport United|Athletic Crown": {home: 1, away: 2}
+
+function statRow(name,homeValue,awayValue,suffix="",decimals=false){
+const h=Number(homeValue || 0);
+const a=Number(awayValue || 0);
+
+const hText=decimals ? h.toFixed(2) : h;
+const aText=decimals ? a.toFixed(2) : a;
+
+const total=h+a;
+
+let homeWidth=50;
+let awayWidth=50;
+
+if(total>0){
+homeWidth=(h/total)*100;
+awayWidth=(a/total)*100;
 }
-};
+
+return `
+<div class="stats-row">
+<div class="stats-top">
+<div class="stats-left">${hText}${suffix}</div>
+<div class="stats-name">${name}</div>
+<div class="stats-right">${aText}${suffix}</div>
+</div>
+<div class="stats-bars">
+<div class="bar-bg"><div class="bar-fill" style="width:${homeWidth}%"></div></div>
+<div class="bar-bg"><div class="bar-fill away-fill" style="width:${awayWidth}%"></div></div>
+</div>
+</div>
+`;
+}
 
 const params=new URLSearchParams(window.location.search);
 const raw=params.get("id");
@@ -223,6 +252,9 @@ const round=parts[1];
 const home=parts[2];
 const away=parts[3];
 
+const firebaseId=makeMatchId(home,away);
+const matchRef=doc(db,"matches",firebaseId);
+
 document.getElementById("matchInfo").textContent=league+" • Matchday "+round;
 document.getElementById("homeTeam").textContent=home;
 document.getElementById("awayTeam").textContent=away;
@@ -231,61 +263,48 @@ document.getElementById("awayTeamLink").href="team.html?team="+encodeURIComponen
 document.getElementById("homeLogo").src=clubLogos[home] || "";
 document.getElementById("awayLogo").src=clubLogos[away] || "";
 
+let lastScoreText=null;
+let latestLiveData=null;
+
+function renderMatch(data){
 let score=null;
 let status="NS";
-let liveData={status:"NS"};
 let events=[];
+let stats=null;
 
-const firebaseId=makeMatchId(home,away);
-
-try{
-const matchRef=doc(db,"matches",firebaseId);
-const matchSnap=await getDoc(matchRef);
-
-if(matchSnap.exists()){
-const data=matchSnap.data();
-
-if(data.homeScore !== undefined && data.awayScore !== undefined){
+if(data && data.homeScore !== undefined && data.awayScore !== undefined){
 score={home:data.homeScore,away:data.awayScore};
-}
-
-liveData=data;
 status=getLiveMinute(data);
 events=data.events || [];
-}
-}catch(error){
-console.log("Firebase error:",error);
-}
-
-if(!score){
+stats=data.stats || null;
+latestLiveData=data;
+}else{
 score=localScores[league]?.[round+"|"+home+"|"+away] || null;
-if(score) status="FT";
+if(score)status="FT";
+latestLiveData=null;
 }
 
-if(score){
 const scoreEl=document.getElementById("score");
 const statusEl=document.getElementById("status");
 
-scoreEl.textContent=score.home+" : "+score.away;
+if(score){
+const newScoreText=score.home+" : "+score.away;
+
+scoreEl.textContent=newScoreText;
 statusEl.textContent=status;
 
-const scoreStorageKey="score-"+firebaseId;
-const currentScoreText=score.home+"-"+score.away;
-const previousScoreText=localStorage.getItem(scoreStorageKey);
-
-if(previousScoreText && previousScoreText!==currentScoreText){
+if(lastScoreText && lastScoreText!==newScoreText){
 scoreEl.classList.add("score-flash");
-
 setTimeout(()=>{
 scoreEl.classList.remove("score-flash");
 },1000);
 }
 
-localStorage.setItem(scoreStorageKey,currentScoreText);
-}
-else{
-document.getElementById("score").textContent="- : -";
-document.getElementById("status").textContent="NS";
+lastScoreText=newScoreText;
+}else{
+scoreEl.textContent="- : -";
+statusEl.textContent="NS";
+lastScoreText=null;
 }
 
 const timeline=document.getElementById("timeline");
@@ -293,8 +312,7 @@ timeline.innerHTML="";
 
 if(events.length===0){
 timeline.innerHTML='<p style="text-align:center;color:#94a3b8;">No events yet</p>';
-}
-
+}else{
 events.sort((a,b)=>parseInt(a.minute)-parseInt(b.minute));
 
 events.forEach(event=>{
@@ -346,55 +364,37 @@ row.innerHTML=`
 
 timeline.appendChild(row);
 });
+}
 
 const statsBox=document.getElementById("matchStats");
-const stats=liveData.stats || null;
-
-function statRow(name,homeValue,awayValue,suffix="",decimals=false){
-const h=Number(homeValue || 0);
-const a=Number(awayValue || 0);
-
-const hText=decimals ? h.toFixed(2) : h;
-const aText=decimals ? a.toFixed(2) : a;
-
-const total=h+a;
-
-let homeWidth=50;
-let awayWidth=50;
-
-if(total>0){
-homeWidth=(h/total)*100;
-awayWidth=(a/total)*100;
-}
-
-return `
-<div class="stats-row">
-<div class="stats-top">
-<div class="stats-left">${hText}${suffix}</div>
-<div class="stats-name">${name}</div>
-<div class="stats-right">${aText}${suffix}</div>
-</div>
-<div class="stats-bars">
-<div class="bar-bg"><div class="bar-fill" style="width:${homeWidth}%"></div></div>
-<div class="bar-bg"><div class="bar-fill away-fill" style="width:${awayWidth}%"></div></div>
-</div>
-</div>
-`;
-}
 
 if(stats){
 statsBox.innerHTML=
-statRow("Possession",stats.homePossession,stats.awayPossession,"%")+
-statRow("Expected Goals (xG)",stats.homeXg,stats.awayXg,"",true)+
-statRow("Shots",stats.homeShots,stats.awayShots)+
-statRow("Shots On Target",stats.homeShotsOnTarget,stats.awayShotsOnTarget)+
-statRow("Corners",stats.homeCorners,stats.awayCorners)+
-statRow("Fouls",stats.homeFouls,stats.awayFouls);
+statRow("Posiadanie",stats.homePossession,stats.awayPossession,"%")+
+statRow("Oczekiwane gole xG",stats.homeXg,stats.awayXg,"",true)+
+statRow("Strzały",stats.homeShots,stats.awayShots)+
+statRow("Strzały celne",stats.homeShotsOnTarget,stats.awayShotsOnTarget)+
+statRow("Rzuty rożne",stats.homeCorners,stats.awayCorners)+
+statRow("Faule",stats.homeFouls,stats.awayFouls);
 }else{
-statsBox.innerHTML='<p style="text-align:center;color:#94a3b8;">No stats yet</p>';
+statsBox.innerHTML='<p style="text-align:center;color:#94a3b8;">Brak statystyk</p>';
 }
 }
 
+onSnapshot(matchRef,(snap)=>{
+if(snap.exists()){
+renderMatch(snap.data());
+}else{
+renderMatch(null);
+}
+});
+
+setInterval(()=>{
+if(latestLiveData){
+document.getElementById("status").textContent=getLiveMinute(latestLiveData);
+}
+},15000);
+}
 </script>
 
 </body>
