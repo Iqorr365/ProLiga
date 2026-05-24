@@ -30,6 +30,15 @@ td.team{text-align:left;font-weight:bold;white-space:nowrap}
 .away{justify-content:flex-end;text-align:right}
 .match .club-logo{width:30px;height:30px;margin:0}
 .score{text-align:center;font-weight:bold;background:white;border:1px solid #e5e7eb;border-radius:10px;padding:8px 4px;color:#0f172a}
+@keyframes scoreFlash{
+0%{transform:scale(1);box-shadow:none}
+35%{transform:scale(1.08);box-shadow:0 0 22px rgba(34,197,94,.75)}
+100%{transform:scale(1);box-shadow:none}
+}
+
+.score-flash{
+animation:scoreFlash .9s ease;
+}
 .not-played{color:#94a3b8}
 .live-badge{
 font-size:11px;
@@ -308,6 +317,15 @@ box.appendChild(title);
 const score=getScore(match);
 const hasScore=score.home!==null&&score.away!==null&&score.home!==undefined&&score.away!==undefined;
 const liveText=getLiveMinute(score);
+
+const matchStorageKey="main-score-"+currentLeague+"-"+match.round+"-"+match.home+"-"+match.away;
+const currentScoreText=hasScore ? score.home+"-"+score.away : "";
+const previousScoreText=localStorage.getItem(matchStorageKey);
+const shouldFlash=previousScoreText && currentScoreText && previousScoreText!==currentScoreText;
+
+if(currentScoreText){
+localStorage.setItem(matchStorageKey,currentScoreText);
+}
   
 const row=document.createElement("div");
 row.className="match";
@@ -325,7 +343,7 @@ row.innerHTML=`
 ${homeLogo}
 <span>${match.home}</span>
 </div>
-<div class="score ${hasScore?"":"not-played"}">
+<div class="score ${hasScore?"":"not-played"} ${shouldFlash?"score-flash":""}">
 ${liveText ? `<div class="live-badge">${liveText}</div>` : ""}
 ${hasScore?score.home+" : "+score.away:"-"}
 </div>
