@@ -358,7 +358,8 @@ const scoreBox=row.querySelector(".score");
 
 if(
 previousScoreText &&
-previousScoreText!==currentScoreText
+previousScoreText!==currentScoreText &&
+(score.status==="LIVE 1H" || score.status==="LIVE 2H")
 ){
 
 requestAnimationFrame(()=>{
