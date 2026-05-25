@@ -318,14 +318,6 @@ const score=getScore(match);
 const hasScore=score.home!==null&&score.away!==null&&score.home!==undefined&&score.away!==undefined;
 const liveText=getLiveMinute(score);
 
-const matchStorageKey="main-score-"+currentLeague+"-"+match.round+"-"+match.home+"-"+match.away;
-const currentScoreText=hasScore ? score.home+"-"+score.away : "";
-const previousScoreText=localStorage.getItem(matchStorageKey);
-const shouldFlash=previousScoreText && currentScoreText && previousScoreText!==currentScoreText;
-
-if(currentScoreText){
-localStorage.setItem(matchStorageKey,currentScoreText);
-}
   
 const row=document.createElement("div");
 row.className="match";
@@ -343,7 +335,7 @@ row.innerHTML=`
 ${homeLogo}
 <span>${match.home}</span>
 </div>
-<div class="score ${hasScore?"":"not-played"} ${shouldFlash?"score-flash":""}">
+<div class="score ${hasScore?"":"not-played"}">
 ${liveText ? `<div class="live-badge">${liveText}</div>` : ""}
 ${hasScore?score.home+" : "+score.away:"-"}
 </div>
@@ -354,6 +346,17 @@ ${awayLogo}
 `;
 
 box.appendChild(row);
+if(hasScore){
+const matchStorageKey="main-score-"+currentLeague+"-"+match.round+"-"+match.home+"-"+match.away;
+const currentScoreText=score.home+"-"+score.away;
+const previousScoreText=localStorage.getItem(matchStorageKey);
+
+if(previousScoreText && previousScoreText!==currentScoreText){
+row.querySelector(".score").classList.add("score-flash");
+}
+
+localStorage.setItem(matchStorageKey,currentScoreText);
+  }
 });
 }
 
