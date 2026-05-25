@@ -347,16 +347,37 @@ ${awayLogo}
 
 box.appendChild(row);
 if(hasScore){
+
 const matchStorageKey="main-score-"+currentLeague+"-"+match.round+"-"+match.home+"-"+match.away;
+
 const currentScoreText=score.home+"-"+score.away;
+
 const previousScoreText=localStorage.getItem(matchStorageKey);
 
-if(previousScoreText && previousScoreText!==currentScoreText){
-row.querySelector(".score").classList.add("score-flash");
+const scoreBox=row.querySelector(".score");
+
+if(
+previousScoreText &&
+previousScoreText!==currentScoreText
+){
+
+requestAnimationFrame(()=>{
+
+setTimeout(()=>{
+scoreBox.classList.remove("score-flash");
+
+void scoreBox.offsetWidth;
+
+scoreBox.classList.add("score-flash");
+},120);
+
+});
+
 }
 
 localStorage.setItem(matchStorageKey,currentScoreText);
-  }
+
+                      }
 });
 }
 
