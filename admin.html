@@ -120,6 +120,16 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 <button class="event-btn" id="statsBtn">Save Match Stats</button>
 <div class="success" id="statsSuccess"></div>
 </div>
+
+<div class="card">
+<h2>Attack Momentum</h2>
+
+<label>Momentum Values</label>
+<textarea id="momentumValues" placeholder="Wpisz wartości od -10 do 10, po przecinku. Przykład: 2,4,6,-3,-5,0,1"></textarea>
+
+<button class="event-btn" id="momentumBtn">Save Attack Momentum</button>
+<div class="success" id="momentumSuccess"></div>
+</div>
   
 <div class="card">
 <h2>Add News</h2>
@@ -360,6 +370,47 @@ stats
 
 document.getElementById("statsSuccess").textContent=
 "Match stats saved successfully!";
+
+};
+
+document.getElementById("momentumBtn").onclick=async()=>{
+
+const selected=getSelectedMatch();
+
+const league=selected.league;
+const round=Number(selected.round);
+const homeTeam=selected.homeTeam;
+const awayTeam=selected.awayTeam;
+
+let momentum=document.getElementById("momentumValues").value
+.split(",")
+.map(value=>Number(value.trim()))
+.filter(value=>!Number.isNaN(value));
+
+momentum=momentum.map(value=>{
+if(value>10)return 10;
+if(value<-10)return -10;
+return value;
+});
+
+while(momentum.length<90){
+momentum.push(momentum[momentum.length-1] || 0);
+}
+
+momentum=momentum.slice(0,100);
+
+const matchId=makeMatchId(homeTeam,awayTeam);
+
+await setDoc(doc(db,"matches",matchId),{
+league,
+round,
+homeTeam,
+awayTeam,
+momentum
+},{merge:true});
+
+document.getElementById("momentumSuccess").textContent=
+"Attack momentum saved successfully!";
 
 };
   
