@@ -63,6 +63,17 @@ to{opacity:1;transform:translateY(0)}
 }
 
 .score-flash{animation:scoreFlash .9s ease}
+.momentum-wrap{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:center}
+.momentum-logos{display:grid;grid-template-rows:1fr 1fr;height:150px;align-items:center}
+.momentum-logos img{width:34px;height:34px;object-fit:contain}
+.momentum-area{position:relative;height:150px;border-radius:14px;background:#111827;border:1px solid #334155;padding:8px;overflow:hidden}
+.momentum-mid{position:absolute;left:8px;right:8px;top:50%;height:1px;background:#475569}
+.momentum-ht{position:absolute;top:8px;bottom:8px;left:50%;width:1px;background:#64748b}
+.momentum-bars{height:100%;display:grid;grid-template-columns:repeat(90,1fr);gap:2px;align-items:center}
+.momentum-bar{position:relative;height:100%}
+.momentum-fill{position:absolute;left:0;right:0;border-radius:3px}
+.momentum-home{bottom:50%;background:#22c55e}
+.momentum-away{top:50%;background:#6366f1}
 .back{display:block;text-align:center;color:#93c5fd;text-decoration:none;margin-top:14px}
 @media(max-width:650px){
 .scoreboard{grid-template-columns:1fr 90px 1fr}
@@ -110,6 +121,11 @@ to{opacity:1;transform:translateY(0)}
 </div>
 </section>
 
+<section class="card" id="momentumCard" style="display:none;">
+<h2>Attack Momentum</h2>
+<div id="momentumChart"></div>
+</section>
+  
 <section class="card">
 <h2>Match Timeline</h2>
 <div class="timeline" id="timeline"></div>
@@ -240,6 +256,48 @@ return `
 `;
 }
 
+function renderMomentum(momentum,events,homeLogo,awayLogo){
+const card=document.getElementById("momentumCard");
+const box=document.getElementById("momentumChart");
+
+if(!momentum || momentum.length===0){
+card.style.display="none";
+box.innerHTML="";
+return;
+}
+
+card.style.display="block";
+
+let values=[...momentum];
+
+while(values.length<90){
+values.push(values[values.length-1] || 0);
+}
+
+values=values.slice(0,90);
+
+box.innerHTML=`
+<div class="momentum-wrap">
+<div class="momentum-logos">
+<img src="${homeLogo}">
+<img src="${awayLogo}">
+</div>
+<div class="momentum-area">
+<div class="momentum-mid"></div>
+<div class="momentum-ht"></div>
+<div class="momentum-bars">
+${values.map(value=>{
+const v=Math.max(-10,Math.min(10,Number(value)||0));
+const height=Math.abs(v)*5;
+const cls=v>=0?"momentum-home":"momentum-away";
+return `<div class="momentum-bar"><div class="momentum-fill ${cls}" style="height:${height}%"></div></div>`;
+}).join("")}
+</div>
+</div>
+</div>
+`;
+  }
+  
 const params=new URLSearchParams(window.location.search);
 const raw=params.get("id");
 
@@ -270,12 +328,14 @@ let score=null;
 let status="NS";
 let events=[];
 let stats=null;
+let momentum=[];
 
 if(data && data.homeScore !== undefined && data.awayScore !== undefined){
 score={home:data.homeScore,away:data.awayScore};
 status=getLiveMinute(data);
 events=data.events || [];
 stats=data.stats || null;
+momentum=data.momentum || [];
 latestLiveData=data;
 }else{
 score=localScores[league]?.[round+"|"+home+"|"+away] || null;
@@ -374,6 +434,7 @@ statRow("Fouls",stats.homeFouls,stats.awayFouls);
 }else{
 statsBox.innerHTML='<p style="text-align:center;color:#94a3b8;">Brak statystyk</p>';
 }
+renderMomentum(momentum,events,clubLogos[home] || "",clubLogos[away] || "");
 }
 
 onSnapshot(matchRef,(snap)=>{
