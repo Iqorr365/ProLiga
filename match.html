@@ -74,6 +74,29 @@ to{opacity:1;transform:translateY(0)}
 .momentum-fill{position:absolute;left:0;right:0;border-radius:3px}
 .momentum-home{bottom:50%;background:#22c55e}
 .momentum-away{top:50%;background:#6366f1}
+.pen-icon{
+position:relative;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+font-size:11px;
+color:#22c55e;
+}
+
+.pen-icon:before{
+content:"";
+position:absolute;
+top:-6px;
+width:18px;
+height:9px;
+border:2px solid currentColor;
+border-bottom:0;
+border-radius:2px 2px 0 0;
+}
+
+.pen-miss{
+color:#dc2626;
+}
 .back{display:block;text-align:center;color:#93c5fd;text-decoration:none;margin-top:14px}
 @media(max-width:650px){
 
@@ -422,12 +445,12 @@ let icon="⚽";
 let className="goal";
 
 if(event.type==="penalty_goal"){
-icon="🥅";
+icon='<span class="pen-icon">⚽</span>';
 className="goal";
 }
 
 if(event.type==="penalty_miss"){
-icon="🥅";
+icon='<span class="pen-icon pen-miss">⚽</span>';
 className="red";
 }
 
