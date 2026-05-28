@@ -74,6 +74,20 @@ to{opacity:1;transform:translateY(0)}
 .momentum-fill{position:absolute;left:0;right:0;border-radius:3px}
 .momentum-home{bottom:50%;background:#22c55e}
 .momentum-away{top:50%;background:#6366f1}
+.momentum-event{
+position:absolute;
+font-size:13px;
+transform:translateX(-50%);
+z-index:5;
+}
+
+.momentum-event.home{
+top:4px;
+}
+
+.momentum-event.away{
+bottom:4px;
+}
 .pen-icon{
 position:relative;
 display:inline-flex;
@@ -348,6 +362,29 @@ values.push(values[values.length-1] || 0);
 
 values=values.slice(0,90);
 
+const eventMarkers=events.map(event=>{
+const minute=parseInt(event.minute);
+
+if(!minute || minute<1 || minute>90)return "";
+
+let icon="";
+
+if(event.type==="goal")icon="⚽";
+if(event.type==="penalty_goal")icon='<span class="pen-icon">⚽</span>';
+if(event.type==="penalty_miss")icon='<span class="pen-icon pen-miss">⚽</span>';
+if(event.type==="red")icon="🟥";
+
+if(!icon)return "";
+
+const isHome=event.team===home;
+
+return `
+<div class="momentum-event ${isHome ? "home" : "away"}" style="left:${(minute/90)*100}%">
+${icon}
+</div>
+`;
+}).join("");
+
 box.innerHTML=`
 <div class="momentum-wrap">
 <div class="momentum-logos">
@@ -355,6 +392,7 @@ box.innerHTML=`
 <img src="${awayLogo}">
 </div>
 <div class="momentum-area">
+${eventMarkers}
 <div class="momentum-mid"></div>
 <div class="momentum-ht"></div>
 <div class="momentum-bars">
