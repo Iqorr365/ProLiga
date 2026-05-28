@@ -76,17 +76,18 @@ to{opacity:1;transform:translateY(0)}
 .momentum-away{top:50%;background:#6366f1}
 .momentum-event{
 position:absolute;
-font-size:13px;
+font-size:10px;
 transform:translateX(-50%);
 z-index:5;
+line-height:1;
 }
 
 .momentum-event.home{
-top:4px;
+top:-15px;
 }
 
 .momentum-event.away{
-bottom:4px;
+bottom:-15px;
 }
 .pen-icon{
 position:relative;
@@ -365,7 +366,9 @@ values=values.slice(0,90);
 const eventMarkers=events.map(event=>{
 const minute=parseInt(event.minute);
 
-if(!minute || minute<1 || minute>90)return "";
+if(!minute || minute<1)return "";
+
+const displayMinute=Math.min(minute,90);
 
 let icon="";
 
@@ -379,7 +382,7 @@ if(!icon)return "";
 const isHome=event.team===home;
 
 return `
-<div class="momentum-event ${isHome ? "home" : "away"}" style="left:${(minute/90)*100}%">
+<div class="momentum-event ${isHome ? "home" : "away"}" style="left:${(displayMinute/90)*100}%">
 ${icon}
 </div>
 `;
