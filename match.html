@@ -79,18 +79,23 @@ position:relative;
 display:inline-flex;
 align-items:center;
 justify-content:center;
+width:18px;
+height:18px;
 font-size:11px;
+line-height:1;
 color:#22c55e;
-margin-right:3px;
-margin-left:3px;
+margin:0 5px;
+vertical-align:middle;
 }
 
 .pen-icon:before{
 content:"";
 position:absolute;
-top:-6px;
-width:18px;
-height:9px;
+top:1px;
+left:50%;
+transform:translateX(-50%);
+width:14px;
+height:7px;
 border:2px solid currentColor;
 border-bottom:0;
 border-radius:2px 2px 0 0;
