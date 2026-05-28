@@ -342,7 +342,7 @@ return `
 `;
 }
 
-function renderMomentum(momentum,events,homeLogo,awayLogo){
+function renderMomentum(momentum,events,homeLogo,awayLogo,home){
 const card=document.getElementById("momentumCard");
 const box=document.getElementById("momentumChart");
 
@@ -544,7 +544,7 @@ statRow("Fouls",stats.homeFouls,stats.awayFouls);
 }else{
 statsBox.innerHTML='<p style="text-align:center;color:#94a3b8;">Brak statystyk</p>';
 }
-renderMomentum(momentum,events,clubLogos[home] || "",clubLogos[away] || "");
+renderMomentum(momentum,events,clubLogos[home] || "",clubLogos[away] || "",home);
 }
 
 onSnapshot(matchRef,(snap)=>{
