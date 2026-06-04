@@ -66,7 +66,7 @@ to{opacity:1;transform:translateY(0)}
 .momentum-wrap{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:center}
 .momentum-logos{display:grid;grid-template-rows:1fr 1fr;height:150px;align-items:center}
 .momentum-logos img{width:34px;height:34px;object-fit:contain}
-.momentum-area{position:relative;height:150px;border-radius:14px;background:#111827;border:1px solid #334155;padding:8px;overflow:hidden}
+.momentum-area{position:relative;height:150px;border-radius:14px;background:#111827;border:1px solid #334155;padding:8px;overflow:visible}
 .momentum-mid{position:absolute;left:8px;right:8px;top:50%;height:1px;background:#475569}
 .momentum-ht{position:absolute;top:8px;bottom:8px;left:50%;width:1px;background:#64748b}
 .momentum-bars{height:100%;display:grid;grid-template-columns:repeat(90,1fr);gap:2px;align-items:center}
@@ -76,18 +76,19 @@ to{opacity:1;transform:translateY(0)}
 .momentum-away{top:50%;background:#6366f1}
 .momentum-event{
 position:absolute;
-font-size:10px;
+font-size:9px;
 transform:translateX(-50%);
-z-index:5;
+z-index:10;
 line-height:1;
+pointer-events:none;
 }
 
 .momentum-event.home{
-top:-15px;
+top:-24px;
 }
 
 .momentum-event.away{
-bottom:-15px;
+bottom:-24px;
 }
 .pen-icon{
 position:relative;
