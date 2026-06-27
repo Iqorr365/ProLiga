@@ -55,12 +55,13 @@ to{opacity:1;transform:translateY(0)}
 .score-flash{animation:scoreFlash .9s ease}
 
 .momentum-wrap{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:center}
-.momentum-logos{display:grid;grid-template-rows:1fr 1fr;height:150px;align-items:center}
+.momentum-logos{display:grid;grid-template-rows:1fr 1fr;height:132px;align-items:center}
 .momentum-logos img{width:34px;height:34px;object-fit:contain}
 
-.momentum-main{display:grid;grid-template-rows:18px 150px 18px;gap:4px}
+.momentum-main{display:grid;grid-template-rows:18px 132px 18px;gap:6px}
 .momentum-events{position:relative;height:18px}
-.momentum-area{position:relative;height:150px;border-radius:14px;background:#111827;border:1px solid #334155;padding:8px;overflow:hidden}
+.momentum-events.bottom{display:flex;align-items:flex-end}
+.momentum-area{position:relative;height:132px;border-radius:14px;background:#111827;border:1px solid #334155;padding:8px;overflow:hidden}
 .momentum-mid{position:absolute;left:8px;right:8px;top:50%;height:1px;background:#475569}
 .momentum-ht{position:absolute;top:8px;bottom:8px;left:50%;width:1px;background:#64748b}
 .momentum-bars{height:100%;display:grid;grid-template-columns:repeat(90,1fr);gap:2px;align-items:center}
@@ -84,11 +85,11 @@ to{opacity:1;transform:translateY(0)}
 .event-box{font-size:12px;padding:8px}
 
 .momentum-wrap{grid-template-columns:24px 1fr;gap:6px}
-.momentum-logos{height:92px}
+.momentum-logos{height:86px}
 .momentum-logos img{width:20px;height:20px}
-.momentum-main{grid-template-rows:14px 92px 14px;gap:3px}
-.momentum-events{height:14px}
-.momentum-area{height:92px;padding:5px}
+.momentum-main{grid-template-rows:13px 86px 13px;gap:4px}
+.momentum-events{height:13px}
+.momentum-area{height:86px;padding:5px}
 .momentum-bars{gap:1px}
 .momentum-event{font-size:7px}
 .momentum-event .pen-icon{width:10px;height:10px;font-size:6px;margin:0 1px}
@@ -341,7 +342,7 @@ return `<div class="momentum-bar"><div class="momentum-fill ${cls}" style="heigh
 </div>
 </div>
 
-<div class="momentum-events">${buildEventMarkers("away")}</div>
+<div class="momentum-events bottom">${buildEventMarkers("away")}</div>
 </div>
 </div>
 `;
