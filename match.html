@@ -57,7 +57,10 @@ to{opacity:1;transform:translateY(0)}
 .momentum-wrap{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:center}
 .momentum-logos{display:grid;grid-template-rows:1fr 1fr;height:150px;align-items:center}
 .momentum-logos img{width:34px;height:34px;object-fit:contain}
-.momentum-area{position:relative;height:150px;border-radius:14px;background:#111827;border:1px solid #334155;padding:8px;overflow:visible}
+
+.momentum-main{display:grid;grid-template-rows:18px 150px 18px;gap:4px}
+.momentum-events{position:relative;height:18px}
+.momentum-area{position:relative;height:150px;border-radius:14px;background:#111827;border:1px solid #334155;padding:8px;overflow:hidden}
 .momentum-mid{position:absolute;left:8px;right:8px;top:50%;height:1px;background:#475569}
 .momentum-ht{position:absolute;top:8px;bottom:8px;left:50%;width:1px;background:#64748b}
 .momentum-bars{height:100%;display:grid;grid-template-columns:repeat(90,1fr);gap:2px;align-items:center}
@@ -66,11 +69,9 @@ to{opacity:1;transform:translateY(0)}
 .momentum-home{bottom:50%;background:#22c55e}
 .momentum-away{top:50%;background:#6366f1}
 .momentum-event{position:absolute;font-size:9px;transform:translateX(-50%);z-index:10;line-height:1;pointer-events:none}
-.momentum-event.home{top:-24px}
-.momentum-event.away{bottom:-24px}
 
-.pen-icon{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:11px;line-height:1;color:#22c55e;margin:0 5px;vertical-align:middle}
-.pen-icon:before{content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:16px;height:9px;border:2px solid currentColor;border-bottom:0;border-radius:2px 2px 0 0;pointer-events:none}
+.pen-icon{position:relative;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;font-size:8px;line-height:1;color:#22c55e;margin:0 2px;vertical-align:middle}
+.pen-icon:before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:10px;height:6px;border:1px solid currentColor;border-bottom:0;border-radius:2px 2px 0 0;pointer-events:none}
 .pen-miss{color:#dc2626}
 
 .back{display:block;text-align:center;color:#93c5fd;text-decoration:none;margin-top:14px}
@@ -81,16 +82,17 @@ to{opacity:1;transform:translateY(0)}
 .score{font-size:34px}
 .event{grid-template-columns:1fr 48px 1fr}
 .event-box{font-size:12px;padding:8px}
+
 .momentum-wrap{grid-template-columns:24px 1fr;gap:6px}
-.momentum-logos{height:98px}
+.momentum-logos{height:92px}
 .momentum-logos img{width:20px;height:20px}
+.momentum-main{grid-template-rows:14px 92px 14px;gap:3px}
+.momentum-events{height:14px}
 .momentum-area{height:92px;padding:5px}
 .momentum-bars{gap:1px}
 .momentum-event{font-size:7px}
-.momentum-event.home{top:-16px}
-.momentum-event.away{bottom:-16px}
-.momentum-event .pen-icon{width:12px;height:12px;font-size:7px;margin:0 1px}
-.momentum-event .pen-icon:before{top:0;width:10px;height:5px;border-width:1px}
+.momentum-event .pen-icon{width:10px;height:10px;font-size:6px;margin:0 1px}
+.momentum-event .pen-icon:before{top:0;width:8px;height:4px;border-width:1px}
 }
 </style>
 </head>
@@ -286,14 +288,14 @@ values.push(values[values.length-1] || 0);
 
 values=values.slice(0,90);
 
-const eventMarkers=events.map(event=>{
+function buildEventMarkers(side){
+return events.map((event,index)=>{
 const minute=parseInt(event.minute);
 
 if(!minute || minute<1)return "";
 
 const displayMinute=Math.min(minute,90);
-const eventIndex=events.indexOf(event);
-const extraOffset=minute>90 ? (eventIndex%4)*7 : 0;
+const extraOffset=minute>90 ? (index%4)*7 : 0;
 
 let icon="";
 
@@ -305,13 +307,16 @@ if(event.type==="red")icon="🟥";
 if(!icon)return "";
 
 const isHome=event.team===home;
+if(side==="home" && !isHome)return "";
+if(side==="away" && isHome)return "";
 
 return `
-<div class="momentum-event ${isHome ? "home" : "away"}" style="left:calc(${(displayMinute/90)*100}% - ${extraOffset}px)">
+<div class="momentum-event" style="left:calc(${(displayMinute/90)*100}% - ${extraOffset}px)">
 ${icon}
 </div>
 `;
 }).join("");
+}
 
 box.innerHTML=`
 <div class="momentum-wrap">
@@ -319,8 +324,11 @@ box.innerHTML=`
 <img src="${homeLogo}">
 <img src="${awayLogo}">
 </div>
+
+<div class="momentum-main">
+<div class="momentum-events">${buildEventMarkers("home")}</div>
+
 <div class="momentum-area">
-${eventMarkers}
 <div class="momentum-mid"></div>
 <div class="momentum-ht"></div>
 <div class="momentum-bars">
@@ -331,6 +339,9 @@ const cls=v>=0?"momentum-home":"momentum-away";
 return `<div class="momentum-bar"><div class="momentum-fill ${cls}" style="height:${height}%"></div></div>`;
 }).join("")}
 </div>
+</div>
+
+<div class="momentum-events">${buildEventMarkers("away")}</div>
 </div>
 </div>
 `;
