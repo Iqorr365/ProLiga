@@ -314,8 +314,13 @@ const isHome=event.team===home;
 if(side==="home" && !isHome)return "";
 if(side==="away" && isHome)return "";
 
+const pos = side==="home"
+    ? "top:0;"
+    : "bottom:0;";
+
 return `
-<div class="momentum-event" style="left:calc(${(displayMinute/90)*100}% - ${extraOffset}px)">
+<div class="momentum-event"
+     style="${pos}left:calc(${(displayMinute/90)*100}% - ${extraOffset}px)">
 ${icon}
 </div>
 `;
