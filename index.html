@@ -35,75 +35,27 @@ td.team{text-align:left;font-weight:bold;white-space:nowrap}
 25%{background:#bbf7d0;transform:scale(1.12);box-shadow:0 0 28px rgba(22,163,74,.95)}
 100%{background:white;transform:scale(1)}
 }
-.score-flash{animation:scoreFlash 1.2s ease !important}
+
+.score-flash{
+animation:scoreFlash 1.2s ease !important;
+}
 .not-played{color:#94a3b8}
-.live-badge{font-size:11px;font-weight:bold;color:#dc2626;margin-bottom:4px;text-transform:uppercase}
-.live-team{color:#dc2626;font-weight:bold}
+.live-badge{
+font-size:11px;
+font-weight:bold;
+color:#dc2626;
+margin-bottom:4px;
+text-transform:uppercase;
+}
+
+.live-team{
+color:#dc2626;
+font-weight:bold;
+}
 .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .info-box{background:#f8fafc;border-radius:14px;padding:14px;text-align:center}
 .info-box b{display:block;font-size:20px}.info-box span{color:#64748b;font-size:13px}
-
-/* PLAYOFFS */
-.playoff-btn{
-width:100%;
-margin-top:18px;
-padding:16px;
-border:1px solid #d4af37;
-border-radius:18px;
-background:linear-gradient(135deg,#0f172a,#3b2f12);
-color:white;
-font-weight:bold;
-font-size:18px;
-cursor:pointer;
-box-shadow:0 6px 18px rgba(212,175,55,.25);
-letter-spacing:.5px
-}
-.playoff-btn span{display:block;font-size:12px;color:#fde68a;margin-top:4px;letter-spacing:0}
-
-.playoff-box{
-display:none;
-margin-top:16px;
-padding:16px;
-border-radius:20px;
-background:
-radial-gradient(circle at top,#78350f55,transparent 34%),
-linear-gradient(135deg,#020617,#111827);
-color:white;
-border:1px solid #d4af37;
-box-shadow:inset 0 0 30px rgba(212,175,55,.08)
-}
-.playoff-title{text-align:center;color:#facc15;font-weight:bold;font-size:20px;margin-bottom:4px}
-.playoff-subtitle{text-align:center;color:#fde68a;font-size:12px;margin-bottom:16px}
-.playoff-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.playoff-final-wrap{margin-top:14px;display:flex;justify-content:center}
-.playoff-match{background:#111827;border:1px solid #334155;border-radius:16px;padding:13px}
-.playoff-final{max-width:420px;width:100%;border-color:#d4af37;box-shadow:0 0 18px rgba(212,175,55,.14)}
-.playoff-label{font-size:12px;color:#facc15;margin-bottom:9px;font-weight:bold;text-transform:uppercase;letter-spacing:.5px}
-.playoff-team{display:flex;align-items:center;gap:8px;font-weight:bold;margin:8px 0;color:white}
-.playoff-team.placeholder{color:#94a3b8}
-.playoff-vs{text-align:center;color:#94a3b8;font-size:12px;margin:6px 0}
-.playoff-note{text-align:center;color:#fde68a;font-size:12px;margin-top:9px}
-.playoff-match-center{
-margin-top:10px;
-width:100%;
-padding:9px;
-border:1px solid #d4af37;
-border-radius:12px;
-background:#1f2937;
-color:#fde68a;
-font-weight:bold;
-font-size:12px;
-cursor:pointer
-}
-.playoff-match-center.disabled{opacity:.55;cursor:not-allowed}
-
-@media(max-width:700px){
-header h1{font-size:30px}
-.info-grid{grid-template-columns:1fr}
-.match{grid-template-columns:1fr 58px 1fr;font-size:13px}
-.playoff-grid{grid-template-columns:1fr}
-.playoff-btn{font-size:16px;padding:14px}
-}
+@media(max-width:700px){header h1{font-size:30px}.info-grid{grid-template-columns:1fr}.match{grid-template-columns:1fr 58px 1fr;font-size:13px}}
 </style>
 </head>
 <body>
@@ -133,7 +85,7 @@ header h1{font-size:30px}
 <h2>League News</h2>
 <div id="latestNews"></div>
 </section>
-
+  
 <div class="tabs">
 <button class="tab active" id="tab1" onclick="switchLeague('ProLiga 1')">
 <img src="Projekt bez nazwy_20260508_214312_0000.png" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;">
@@ -154,14 +106,6 @@ ProLiga 2
 <tbody id="leagueTable"></tbody>
 </table>
 <div class="legend" id="legend"></div>
-
-<div id="playoffArea">
-<button class="playoff-btn" onclick="togglePlayoffs()">
-🏆 PLAYOFFS
-<span>Championship Finals</span>
-</button>
-<div class="playoff-box" id="playoffBox"></div>
-</div>
 </section>
 
 <section class="card">
@@ -232,10 +176,9 @@ const localScores={
 "1|Westport United|Athletic Crown":{home:1,away:2}
 }
 };
-
+  
 let scores={};
 let currentLeague="ProLiga 1";
-let standingsOrder=[];
 let teams=leagues[currentLeague];
 let matches=createSchedule(teams);
 
@@ -310,7 +253,7 @@ return "LIVE 90+"+(minute-90)+"'";
 
 return "LIVE "+minute+"'";
   }
-
+  
 async function loadScoresFromFirebase(){
 scores={};
 
@@ -331,7 +274,7 @@ if(!scores[league])scores[league]={};
 const key=round+"|"+homeTeam+"|"+awayTeam;
 
 if(data.homeScore === undefined || data.awayScore === undefined)return;
-
+  
 scores[league][key]={
 home:data.homeScore,
 away:data.awayScore,
@@ -355,7 +298,6 @@ document.getElementById("tab2").classList.toggle("active",currentLeague==="ProLi
 renderMatches();
 renderTable();
 renderLegend();
-renderPlayoffs();
 };
 
 function renderMatches(){
@@ -376,6 +318,7 @@ const score=getScore(match);
 const hasScore=score.home!==null&&score.away!==null&&score.home!==undefined&&score.away!==undefined;
 const liveText=getLiveMinute(score);
 
+  
 const row=document.createElement("div");
 row.className="match";
 
@@ -406,22 +349,36 @@ box.appendChild(row);
 if(hasScore){
 
 const matchStorageKey="main-score-"+currentLeague+"-"+match.round+"-"+match.home+"-"+match.away;
+
 const currentScoreText=score.home+"-"+score.away;
+
 const previousScoreText=localStorage.getItem(matchStorageKey);
+
 const scoreBox=row.querySelector(".score");
 
-if(previousScoreText && previousScoreText!==currentScoreText && (score.status==="LIVE 1H" || score.status==="LIVE 2H")){
+if(
+previousScoreText &&
+previousScoreText!==currentScoreText &&
+(score.status==="LIVE 1H" || score.status==="LIVE 2H")
+){
+
 requestAnimationFrame(()=>{
+
 setTimeout(()=>{
 scoreBox.classList.remove("score-flash");
+
 void scoreBox.offsetWidth;
+
 scoreBox.classList.add("score-flash");
 },120);
+
 });
+
 }
 
 localStorage.setItem(matchStorageKey,currentScoreText);
-}
+
+                      }
 });
 }
 
@@ -486,8 +443,6 @@ if(b.goalsFor!==a.goalsFor)return b.goalsFor-a.goalsFor;
 
 return a.name.localeCompare(b.name);
 });
-
-standingsOrder=sorted;
 
 const tbody=document.getElementById("leagueTable");
 tbody.innerHTML="";
@@ -554,76 +509,9 @@ legend.innerHTML=`<span><i class="dot green2"></i>Direct Promotion</span>`;
 }
 }
 
-window.togglePlayoffs=function(){
-const box=document.getElementById("playoffBox");
-box.style.display=box.style.display==="block"?"none":"block";
-};
-
-function renderPlayoffs(){
-const area=document.getElementById("playoffArea");
-const box=document.getElementById("playoffBox");
-
-if(currentLeague!=="ProLiga 1"){
-area.style.display="none";
-return;
-}
-
-area.style.display="block";
-
-const t1=standingsOrder[0];
-const t2=standingsOrder[1];
-const t3=standingsOrder[2];
-const t4=standingsOrder[3];
-
-if(!t1 || !t2 || !t3 || !t4){
-box.innerHTML="";
-return;
-}
-
-function teamLine(team,pos){
-const logo=clubLogos[team.name]?`<img src="${clubLogos[team.name]}" class="club-logo">`:"";
-return `<div class="playoff-team"><span>${pos}.</span>${logo}<span>${team.name}</span></div>`;
-}
-
-box.innerHTML=`
-<div class="playoff-title">🏆 Championship Playoffs</div>
-<div class="playoff-subtitle">Road to the ProLiga 1 title</div>
-
-<div class="playoff-grid">
-<div class="playoff-match">
-<div class="playoff-label">Semi-final 1</div>
-${teamLine(t1,1)}
-<div class="playoff-vs">VS</div>
-${teamLine(t4,4)}
-<button class="playoff-match-center disabled">Match Center soon</button>
-</div>
-
-<div class="playoff-match">
-<div class="playoff-label">Semi-final 2</div>
-${teamLine(t2,2)}
-<div class="playoff-vs">VS</div>
-${teamLine(t3,3)}
-<button class="playoff-match-center disabled">Match Center soon</button>
-</div>
-</div>
-
-<div class="playoff-final-wrap">
-<div class="playoff-match playoff-final">
-<div class="playoff-label">Final</div>
-<div class="playoff-team placeholder">Winner SF1</div>
-<div class="playoff-vs">VS</div>
-<div class="playoff-team placeholder">Winner SF2</div>
-<button class="playoff-match-center disabled">Match Center soon</button>
-<div class="playoff-note">Finalists will be confirmed after the semi-finals.</div>
-</div>
-</div>
-`;
-}
-
 renderMatches();
 renderTable();
 renderLegend();
-renderPlayoffs();
 
 async function loadLatestNews(){
 const box=document.getElementById("latestNews");
@@ -659,4 +547,47 @@ border="#f97316";
 
 if(item.category==="ProLiga 2"){
 bg="#eff6ff";
-b
+border="#2563eb";
+}
+
+box.innerHTML=`
+<a href="news.html" style="text-decoration:none;color:inherit;">
+<div style="padding:16px;border-radius:16px;border:3px dashed ${border};background:${bg};">
+<div style="font-size:12px;margin-bottom:8px;color:#64748b;">
+${item.category || "General"}
+</div>
+
+<div style="font-size:22px;font-weight:bold;margin-bottom:8px;">
+${item.title || ""}
+</div>
+
+<div style="color:#475569;">
+${item.text || ""}
+</div>
+</div>
+</a>
+`;
+}
+  
+loadScoresFromFirebase()
+.then(()=>{
+renderMatches();
+renderTable();
+renderLegend();
+})
+.catch(error=>{
+console.log("Firebase error:",error);
+});
+loadLatestNews();
+setInterval(()=>{
+loadScoresFromFirebase()
+.then(()=>{
+renderMatches();
+renderTable();
+renderLegend();
+});
+},15000);
+</script>
+
+</body>
+</html>
