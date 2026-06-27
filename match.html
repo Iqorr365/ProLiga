@@ -347,7 +347,22 @@ box.innerHTML=`
 <div class="momentum-bars">
 ${values.map(value=>{
 const v=Math.max(-10,Math.min(10,Number(value)||0));
-const height=Math.abs(v)*10;
+
+const heights={
+0:0,
+1:10,
+2:20,
+3:30,
+4:40,
+5:50,
+6:60,
+7:70,
+8:79,
+9:89,
+10:98
+};
+
+const height=heights[Math.abs(v)];
 const cls=v>=0?"momentum-home":"momentum-away";
 return `<div class="momentum-bar"><div class="momentum-fill ${cls}" style="height:${height}%"></div></div>`;
 }).join("")}
