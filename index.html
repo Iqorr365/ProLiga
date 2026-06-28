@@ -339,6 +339,7 @@ document.getElementById("tab2").classList.toggle("active",currentLeague==="ProLi
 renderMatches();
 renderTable();
 renderLegend();
+renderPlayoffs();
 };
 
 function renderMatches(){
@@ -552,6 +553,8 @@ legend.innerHTML=`<span><i class="dot green2"></i>Direct Promotion</span>`;
 }
 
 window.togglePlayoffs=function(){
+renderPlayoffs();
+
 const box=document.getElementById("playoffBox");
 box.style.display=box.style.display==="block"?"none":"block";
 };
@@ -562,8 +565,9 @@ const box=document.getElementById("playoffBox");
 
 if(currentLeague!=="ProLiga 1"){
 area.style.display="none";
+box.style.display="none";
 return;
-}
+                                 }
 
 area.style.display="block";
 
@@ -611,6 +615,7 @@ ${teamLine(t3,3)}
 renderMatches();
 renderTable();
 renderLegend();
+renderPlayoffs();
 
 async function loadLatestNews(){
 const box=document.getElementById("latestNews");
@@ -673,6 +678,7 @@ loadScoresFromFirebase()
 renderMatches();
 renderTable();
 renderLegend();
+renderPlayoffs();
 })
 .catch(error=>{
 console.log("Firebase error:",error);
@@ -684,6 +690,7 @@ loadScoresFromFirebase()
 renderMatches();
 renderTable();
 renderLegend();
+renderPlayoffs();
 });
 },15000);
 </script>
