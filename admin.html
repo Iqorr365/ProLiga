@@ -35,6 +35,14 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 <label>Select Match</label>
 <select id="matchSelect"></select>
 
+<div id="playoffTeamsBox" style="display:none;">
+<label>Playoff Home Team</label>
+<select id="playoffHomeTeam"></select>
+
+<label>Playoff Away Team</label>
+<select id="playoffAwayTeam"></select>
+</div>
+
 <label>Home Score</label>
 <input type="number" id="homeScore" value="0">
 
@@ -118,6 +126,7 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 
 <label>Away Fouls</label>
 <input type="number" id="awayFouls" value="0">
+
 <button class="event-btn" id="statsBtn">Save Match Stats</button>
 <div class="success" id="statsSuccess"></div>
 </div>
@@ -199,7 +208,12 @@ homeTeam:"Winner SF1",
 awayTeam:"Winner SF2"
 }
 ];
-  
+
+const allTeams=[
+...leagues["ProLiga 1"],
+...leagues["ProLiga 2"]
+];
+
 function createSchedule(teams){
 const firstHalf=[];
 const arr=[...teams];
@@ -235,22 +249,67 @@ return[...firstHalf,...secondHalf];
 function makeMatchId(home,away,customId=null){
 if(customId)return customId;
 return home.toLowerCase().trim().replaceAll(" ","-")+"-"+away.toLowerCase().trim().replaceAll(" ","-");
-  }
+}
 
 function getSelectedMatch(){
 return JSON.parse(document.getElementById("matchSelect").value);
 }
 
+function fillPlayoffTeamSelects(){
+const homeSelect=document.getElementById("playoffHomeTeam");
+const awaySelect=document.getElementById("playoffAwayTeam");
+
+homeSelect.innerHTML="";
+awaySelect.innerHTML="";
+
+allTeams.forEach(team=>{
+const homeOption=document.createElement("option");
+homeOption.value=team;
+homeOption.textContent=team;
+homeSelect.appendChild(homeOption);
+
+const awayOption=document.createElement("option");
+awayOption.value=team;
+awayOption.textContent=team;
+awaySelect.appendChild(awayOption);
+});
+}
+
+function getAdminTeams(selected){
+const isPlayoff=selected.isPlayoff || false;
+
+const homeTeam=isPlayoff
+? document.getElementById("playoffHomeTeam").value
+: selected.homeTeam;
+
+const awayTeam=isPlayoff
+? document.getElementById("playoffAwayTeam").value
+: selected.awayTeam;
+
+return {homeTeam,awayTeam};
+}
+
 function updateEventTeams(){
 const selected=getSelectedMatch();
 
+const isPlayoff=selected.isPlayoff || false;
+const playoffBox=document.getElementById("playoffTeamsBox");
+
+if(isPlayoff){
+playoffBox.style.display="block";
+}else{
+playoffBox.style.display="none";
+}
+
+const {homeTeam,awayTeam}=getAdminTeams(selected);
+
 document.getElementById("selectedMatchInfo").textContent=
-selected.homeTeam+" vs "+selected.awayTeam;
+homeTeam+" vs "+awayTeam;
 
 const eventTeam=document.getElementById("eventTeam");
 eventTeam.innerHTML="";
 
-[selected.homeTeam,selected.awayTeam].forEach(team=>{
+[homeTeam,awayTeam].forEach(team=>{
 const option=document.createElement("option");
 option.value=team;
 option.textContent=team;
@@ -281,6 +340,7 @@ option.textContent=match.round+" | "+match.homeTeam+" vs "+match.awayTeam;
 select.appendChild(option);
 });
 
+fillPlayoffTeamSelects();
 updateEventTeams();
 return;
 }
@@ -304,18 +364,19 @@ select.appendChild(option);
 });
 
 updateEventTeams();
-  }
+}
 
 document.getElementById("league").onchange=loadMatches;
 document.getElementById("matchSelect").onchange=updateEventTeams;
+document.getElementById("playoffHomeTeam").onchange=updateEventTeams;
+document.getElementById("playoffAwayTeam").onchange=updateEventTeams;
 
 document.getElementById("saveBtn").onclick=async()=>{
 const selected=getSelectedMatch();
+const {homeTeam,awayTeam}=getAdminTeams(selected);
 
 const league=selected.league;
-const round=Number(selected.round);
-const homeTeam=selected.homeTeam;
-const awayTeam=selected.awayTeam;
+const round=selected.round;
 
 const homeScore=Number(document.getElementById("homeScore").value);
 const awayScore=Number(document.getElementById("awayScore").value);
@@ -324,6 +385,7 @@ const liveMinute=Number(document.getElementById("liveMinute").value);
 const liveStartedAt=Date.now();
 
 const matchId=makeMatchId(homeTeam,awayTeam,selected.id);
+
 await setDoc(doc(db,"matches",matchId),{
 league,
 round,
@@ -337,17 +399,17 @@ liveStartedAt,
 isPlayoff:selected.isPlayoff || false,
 playoffId:selected.id || null,
 },{merge:true});
+
 document.getElementById("success").textContent=
 "Saved: "+homeTeam+" "+homeScore+" - "+awayScore+" "+awayTeam;
 };
 
 document.getElementById("eventBtn").onclick=async()=>{
 const selected=getSelectedMatch();
+const {homeTeam,awayTeam}=getAdminTeams(selected);
 
 const league=selected.league;
-const round=Number(selected.round);
-const homeTeam=selected.homeTeam;
-const awayTeam=selected.awayTeam;
+const round=selected.round;
 
 const minute=document.getElementById("eventMinute").value;
 const team=document.getElementById("eventTeam").value;
@@ -365,6 +427,8 @@ league,
 round,
 homeTeam,
 awayTeam,
+isPlayoff:selected.isPlayoff || false,
+playoffId:selected.id || null,
 events:arrayUnion({
 minute:minute+"'",
 team,
@@ -379,13 +443,11 @@ document.getElementById("eventMinute").value="";
 };
 
 document.getElementById("statsBtn").onclick=async()=>{
-
 const selected=getSelectedMatch();
+const {homeTeam,awayTeam}=getAdminTeams(selected);
 
 const league=selected.league;
-const round=Number(selected.round);
-const homeTeam=selected.homeTeam;
-const awayTeam=selected.awayTeam;
+const round=selected.round;
 
 const stats={
 homePossession:Number(document.getElementById("homePossession").value),
@@ -414,22 +476,21 @@ league,
 round,
 homeTeam,
 awayTeam,
+isPlayoff:selected.isPlayoff || false,
+playoffId:selected.id || null,
 stats
 },{merge:true});
 
 document.getElementById("statsSuccess").textContent=
 "Match stats saved successfully!";
-
 };
 
 document.getElementById("momentumBtn").onclick=async()=>{
-
 const selected=getSelectedMatch();
+const {homeTeam,awayTeam}=getAdminTeams(selected);
 
 const league=selected.league;
-const round=Number(selected.round);
-const homeTeam=selected.homeTeam;
-const awayTeam=selected.awayTeam;
+const round=selected.round;
 
 let momentum=document.getElementById("momentumValues").value
 .split(",")
@@ -455,12 +516,13 @@ league,
 round,
 homeTeam,
 awayTeam,
+isPlayoff:selected.isPlayoff || false,
+playoffId:selected.id || null,
 momentum
 },{merge:true});
 
 document.getElementById("momentumSuccess").textContent=
 "Attack momentum saved successfully!";
-
 };
   
 document.getElementById("newsBtn").onclick=async()=>{
