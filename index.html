@@ -551,6 +551,63 @@ legend.innerHTML=`<span><i class="dot green2"></i>Direct Promotion</span>`;
 }
 }
 
+window.togglePlayoffs=function(){
+const box=document.getElementById("playoffBox");
+box.style.display=box.style.display==="block"?"none":"block";
+};
+
+function renderPlayoffs(){
+const area=document.getElementById("playoffArea");
+const box=document.getElementById("playoffBox");
+
+if(currentLeague!=="ProLiga 1"){
+area.style.display="none";
+return;
+}
+
+area.style.display="block";
+
+const t1=standingsOrder[0];
+const t2=standingsOrder[1];
+const t3=standingsOrder[2];
+const t4=standingsOrder[3];
+
+if(!t1 || !t2 || !t3 || !t4){
+box.innerHTML="";
+return;
+}
+
+function teamLine(team,pos){
+const logo=clubLogos[team.name]?`<img src="${clubLogos[team.name]}" class="club-logo">`:"";
+return `<div class="playoff-team"><span>${pos}.</span>${logo}<span>${team.name}</span></div>`;
+}
+
+box.innerHTML=`
+<div class="playoff-title">🏆 Championship Playoffs</div>
+
+<div class="playoff-match">
+<div class="playoff-label">Semi-final 1</div>
+${teamLine(t1,1)}
+<div class="playoff-vs">VS</div>
+${teamLine(t4,4)}
+</div>
+
+<div class="playoff-match">
+<div class="playoff-label">Semi-final 2</div>
+${teamLine(t2,2)}
+<div class="playoff-vs">VS</div>
+${teamLine(t3,3)}
+</div>
+
+<div class="playoff-match">
+<div class="playoff-label">Final</div>
+<div class="playoff-team">Winner SF1</div>
+<div class="playoff-vs">VS</div>
+<div class="playoff-team">Winner SF2</div>
+</div>
+`;
+}
+  
 renderMatches();
 renderTable();
 renderLegend();
