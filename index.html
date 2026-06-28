@@ -85,9 +85,9 @@ border:1px solid #d4af37
 .playoff-label{font-size:12px;color:#facc15;margin-bottom:8px;font-weight:bold}
 .playoff-row{
 display:grid;
-grid-template-columns:1fr 60px 1fr;
+grid-template-columns:minmax(0,1fr) 50px minmax(0,1fr);
 align-items:center;
-gap:10px;
+gap:8px;
 }
 
 .playoff-team{
@@ -96,15 +96,18 @@ align-items:center;
 gap:8px;
 font-weight:bold;
 margin:7px 0;
+min-width:0;
 }
 
 .playoff-home{
 justify-content:flex-start;
+overflow:hidden;
 }
 
 .playoff-away{
 justify-content:flex-end;
 text-align:right;
+overflow:hidden;
 }
 
 .playoff-vs{
