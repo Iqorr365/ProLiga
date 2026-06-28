@@ -29,6 +29,7 @@ button{width:100%;padding:14px;border:none;border-radius:14px;background:#16a34a
 <select id="league">
 <option>ProLiga 1</option>
 <option>ProLiga 2</option>
+<option>Playoffs</option>
 </select>
 
 <label>Select Match</label>
@@ -175,6 +176,30 @@ const leagues={
 "ProLiga 2":["Portfield United","Atletico Bellmont","Deportivo Vale","Riverham FC","Westport United","Athletic Crown","Albion Kingsport","FC Southmoor","Highmoor Rovers","Stalovia"]
 };
 
+const playoffMatches=[
+{
+id:"playoff-sf1",
+league:"Playoffs",
+round:"Semi-final 1",
+homeTeam:"Winner/1st Place",
+awayTeam:"Winner/4th Place"
+},
+{
+id:"playoff-sf2",
+league:"Playoffs",
+round:"Semi-final 2",
+homeTeam:"Winner/2nd Place",
+awayTeam:"Winner/3rd Place"
+},
+{
+id:"playoff-final",
+league:"Playoffs",
+round:"Final",
+homeTeam:"Winner SF1",
+awayTeam:"Winner SF2"
+}
+];
+  
 function createSchedule(teams){
 const firstHalf=[];
 const arr=[...teams];
@@ -207,9 +232,10 @@ round:m.round+rounds
 return[...firstHalf,...secondHalf];
 }
 
-function makeMatchId(home,away){
+function makeMatchId(home,away,customId=null){
+if(customId)return customId;
 return home.toLowerCase().trim().replaceAll(" ","-")+"-"+away.toLowerCase().trim().replaceAll(" ","-");
-}
+  }
 
 function getSelectedMatch(){
 return JSON.parse(document.getElementById("matchSelect").value);
@@ -234,11 +260,33 @@ eventTeam.appendChild(option);
 
 function loadMatches(){
 const league=document.getElementById("league").value;
-const teams=leagues[league];
-const matches=createSchedule(teams);
 const select=document.getElementById("matchSelect");
 
 select.innerHTML="";
+
+if(league==="Playoffs"){
+playoffMatches.forEach(match=>{
+const option=document.createElement("option");
+
+option.value=JSON.stringify({
+id:match.id,
+league:match.league,
+round:match.round,
+homeTeam:match.homeTeam,
+awayTeam:match.awayTeam,
+isPlayoff:true
+});
+
+option.textContent=match.round+" | "+match.homeTeam+" vs "+match.awayTeam;
+select.appendChild(option);
+});
+
+updateEventTeams();
+return;
+}
+
+const teams=leagues[league];
+const matches=createSchedule(teams);
 
 matches.forEach(match=>{
 const option=document.createElement("option");
@@ -247,7 +295,8 @@ option.value=JSON.stringify({
 league,
 round:match.round,
 homeTeam:match.home,
-awayTeam:match.away
+awayTeam:match.away,
+isPlayoff:false
 });
 
 option.textContent="Matchday "+match.round+" | "+match.home+" vs "+match.away;
@@ -255,7 +304,7 @@ select.appendChild(option);
 });
 
 updateEventTeams();
-}
+  }
 
 document.getElementById("league").onchange=loadMatches;
 document.getElementById("matchSelect").onchange=updateEventTeams;
@@ -274,8 +323,7 @@ const status=document.getElementById("status").value;
 const liveMinute=Number(document.getElementById("liveMinute").value);
 const liveStartedAt=Date.now();
 
-const matchId=makeMatchId(homeTeam,awayTeam);
-
+const matchId=makeMatchId(homeTeam,awayTeam,selected.id);
 await setDoc(doc(db,"matches",matchId),{
 league,
 round,
@@ -286,8 +334,9 @@ awayScore,
 status,
 liveMinute,
 liveStartedAt,
+isPlayoff:selected.isPlayoff || false,
+playoffId:selected.id || null,
 },{merge:true});
-
 document.getElementById("success").textContent=
 "Saved: "+homeTeam+" "+homeScore+" - "+awayScore+" "+awayTeam;
 };
@@ -309,7 +358,7 @@ document.getElementById("eventSuccess").textContent="Enter minute first.";
 return;
 }
 
-const matchId=makeMatchId(homeTeam,awayTeam);
+const matchId=makeMatchId(homeTeam,awayTeam,selected.id);
 
 await setDoc(doc(db,"matches",matchId),{
 league,
@@ -358,7 +407,7 @@ homeFouls:Number(document.getElementById("homeFouls").value),
 awayFouls:Number(document.getElementById("awayFouls").value)
 };
 
-const matchId=makeMatchId(homeTeam,awayTeam);
+const matchId=makeMatchId(homeTeam,awayTeam,selected.id);
 
 await setDoc(doc(db,"matches",matchId),{
 league,
@@ -399,7 +448,7 @@ momentum.push(momentum[momentum.length-1] || 0);
 
 momentum=momentum.slice(0,100);
 
-const matchId=makeMatchId(homeTeam,awayTeam);
+const matchId=makeMatchId(homeTeam,awayTeam,selected.id);
 
 await setDoc(doc(db,"matches",matchId),{
 league,
