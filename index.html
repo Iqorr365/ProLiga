@@ -83,8 +83,36 @@ border:1px solid #d4af37
 .playoff-title{color:#facc15;font-weight:bold;margin-bottom:12px;text-align:center}
 .playoff-match{background:#111827;border:1px solid #334155;border-radius:14px;padding:12px;margin-bottom:12px}
 .playoff-label{font-size:12px;color:#facc15;margin-bottom:8px;font-weight:bold}
-.playoff-team{display:flex;align-items:center;gap:8px;font-weight:bold;margin:7px 0}
-.playoff-vs{text-align:center;color:#94a3b8;font-size:12px}
+.playoff-row{
+display:grid;
+grid-template-columns:1fr 60px 1fr;
+align-items:center;
+gap:10px;
+}
+
+.playoff-team{
+display:flex;
+align-items:center;
+gap:8px;
+font-weight:bold;
+margin:7px 0;
+}
+
+.playoff-home{
+justify-content:flex-start;
+}
+
+.playoff-away{
+justify-content:flex-end;
+text-align:right;
+}
+
+.playoff-vs{
+text-align:center;
+font-size:13px;
+font-weight:bold;
+color:#94a3b8;
+}
   
 @media(max-width:700px){header h1{font-size:30px}.info-grid{grid-template-columns:1fr}.match{grid-template-columns:1fr 58px 1fr;font-size:13px}}
 </style>
@@ -581,33 +609,71 @@ box.innerHTML="";
 return;
 }
 
-function teamLine(team,pos){
-const logo=clubLogos[team.name]?`<img src="${clubLogos[team.name]}" class="club-logo">`:"";
-return `<div class="playoff-team"><span>${pos}.</span>${logo}<span>${team.name}</span></div>`;
+function teamLine(team,pos,side){
+const logo=clubLogos[team.name]
+? `<img src="${clubLogos[team.name]}" class="club-logo">`
+: "";
+
+if(side==="away"){
+return `
+<div class="playoff-team playoff-away">
+<span>${team.name}</span>
+${logo}
+<span>${pos}.</span>
+</div>`;
 }
+
+return `
+<div class="playoff-team playoff-home">
+<span>${pos}.</span>
+${logo}
+<span>${team.name}</span>
+</div>`;
+  }
 
 box.innerHTML=`
 <div class="playoff-title">🏆 Championship Playoffs</div>
 
 <div class="playoff-match">
 <div class="playoff-label">Semi-final 1</div>
-${teamLine(t1,1)}
+
+<div class="playoff-row">
+${teamLine(t1,1,"home")}
 <div class="playoff-vs">VS</div>
-${teamLine(t4,4)}
+${teamLine(t4,4,"away")}
+</div>
+
 </div>
 
 <div class="playoff-match">
 <div class="playoff-label">Semi-final 2</div>
-${teamLine(t2,2)}
+
+<div class="playoff-row">
+${teamLine(t2,2,"home")}
 <div class="playoff-vs">VS</div>
-${teamLine(t3,3)}
+${teamLine(t3,3,"away")}
+</div>
+
 </div>
 
 <div class="playoff-match">
 <div class="playoff-label">Final</div>
-<div class="playoff-team">Winner SF1</div>
-<div class="playoff-vs">VS</div>
-<div class="playoff-team">Winner SF2</div>
+
+<div class="playoff-row">
+<div class="playoff-team playoff-home">
+Winner SF1
+</div>
+
+<div class="playoff-vs">
+VS
+</div>
+
+<div class="playoff-team playoff-away">
+Winner SF2
+</div>
+
+</div>
+
 </div>
 `;
 }
